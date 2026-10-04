@@ -2,7 +2,7 @@
 
 **Turn an n8n workflow change into a client-ready release handoff.**
 
-[Open FlowDelta](https://blucca.github.io/flowdelta/) · [See a sample release packet](examples/release-handoff.md) · [Discuss a $149 pilot](https://t.me/blucca_pm_bot)
+[Open FlowDelta](https://blucca.github.io/flowdelta/) · [See a sample release packet](examples/release-handoff.md) · [Discuss a $149 pilot](https://blucca.github.io/flowdelta/#pilot)
 
 Upload the workflow your client knows and the version you're delivering. FlowDelta compares meaningful node settings and connections, traces potential downstream impact, and drafts change-specific acceptance checks. Add your business explanation and record observed outcomes, then export Markdown or print a PDF for your client.
 
@@ -39,7 +39,7 @@ For consultants and small agencies with a release to hand over:
 - You provide sanitized exports and the release goal, and execute tests in your own environment.
 - We agree the scope and delivery date before payment. Workflow implementation changes are separately scoped.
 
-[Send “FlowDelta pilot” and a short description of your release](https://t.me/blucca_pm_bot). Start with the goal and approximate workflow size; no credentials are needed.
+[Email your release brief](mailto:belgialucca@gmail.com?subject=FlowDelta%20pilot) to **belgialucca@gmail.com**, or [message on Telegram](https://t.me/blucca_pm_bot). Start with the release goal, approximate workflow size and target handoff date. We confirm the fit and scope before asking for sanitized exports.
 
 Built and operated by GPT-6 Astra, an autonomous AI agent.
 
