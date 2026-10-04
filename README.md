@@ -4,7 +4,7 @@
 
 [Open FlowDelta](https://blucca.github.io/flowdelta/) · [See a sample release packet](examples/release-handoff.md) · [Discuss a $149 pilot](https://blucca.github.io/flowdelta/#pilot)
 
-Upload the workflow your client knows and the version you're delivering. FlowDelta compares meaningful node settings and connections, traces potential downstream impact, and drafts change-specific acceptance checks. Add your business explanation and record observed outcomes, then export Markdown or print a PDF for your client.
+Upload the workflow your client knows and the version you're delivering. FlowDelta compares meaningful node settings and connections, traces potential downstream impact, and drafts change-specific acceptance checks. Add your business explanation, tailor the acceptance plan, and record observed outcomes. Export Markdown or print a PDF for your client.
 
 ## Try it
 
@@ -19,11 +19,20 @@ You can also download [before](examples/before.json) and [after](examples/after.
 - Nodes matched by stable ID, falling back to names when IDs are absent.
 - Parameters, node types/versions, credentials references, webhook identifiers, retry/error behavior, activation and workflow settings.
 - Connection endpoints, output branches, input sockets and AI connections.
+- Potential changes to main-branch execution order when relative canvas positions change; includes affected sibling branches and downstream nodes.
 - Potential downstream dependencies across both versions, including literal `$('Node')` and `$node['Node']` expression references.
 - Expandable before/after values, with per-change opt-in inclusion in Markdown and PDF.
 - Node-specific acceptance suggestions for IF/Switch, HTTP, Code, Merge and changed error-handling behavior.
 
-Canvas movements, notes and pinned execution data are excluded. Static reachability suggests what to investigate; execute the checks in your own n8n test environment and record what actually happened. Dynamic code, runtime expressions, remote services and sub-workflows can have additional dependencies.
+Pure layout changes that preserve relative branch order, notes and pinned execution data are excluded. n8n v1 can use canvas positions to order branches; FlowDelta flags changed relative positions among common branch targets, while runtime data determines which branches actually execute. Both exports explicitly using v0 skip this position check. See [n8n execution-order documentation](https://docs.n8n.io/flow-logic/execution-order/). Static reachability suggests what to investigate; execute the checks in your own n8n test environment and record what actually happened. Dynamic code, runtime expressions, remote services and sub-workflows can have additional dependencies.
+
+## Tailor the acceptance plan
+
+- Edit each suggested check’s title, test plan (input, steps and expected result), and affected node names. Enter one node per line, or leave the list blank for a workflow-wide check.
+- **Add business check** for release-specific requirements and regression cases. Every added check starts **Not run**. Remove checks that do not belong in this release.
+- Record actual observations separately from the plan. Editing a plan resets its outcome to **Not run** and keeps existing observations, labeled as previous evidence requiring review. After reviewing and running the revised check, explicitly record **Pass** or **Fail** again to confirm the new result.
+- Markdown and PDF use your edited plan, current outcomes and observations. Exact workflow values remain opt-in per change.
+- Changing workflow inputs or rebuilding the report clears plan edits, added checks, observations and value-sharing selections. Download the handoff before switching versions; refreshing also clears the workspace.
 
 ## Local processing
 

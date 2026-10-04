@@ -78,7 +78,7 @@ function conditionOperators(value, operators = []) {
 
 export function analyze(beforeInput, afterInput, { includeValues = false } = {}) {
   const before = parseWorkflow(beforeInput), after = parseWorkflow(afterInput);
-  const warnings = ['Potential impact is a static estimate across both workflow versions, not execution validation. Scope: node parameters, type/version, webhook identifiers, credentials, execution flags, connections, workflow settings and activation; other metadata is ignored.'];
+  const warnings = ['Potential impact is a static estimate across both workflow versions, not execution validation. Scope: node parameters, type/version, webhook identifiers, credentials, execution flags, connections, potential main-branch execution order from relative canvas positions, workflow settings and activation; other metadata is ignored.'];
   const beforeKeys = new Map(), afterKeys = new Map(), pairs = [], taken = new Set();
   const afterById = new Map(after.nodes.filter(n => n.id).map(n => [n.id, n]));
   const afterByName = new Map(after.nodes.map(n => [n.name, n]));
@@ -159,6 +159,46 @@ export function analyze(beforeInput, afterInput, { includeValues = false } = {})
     // Rewiring directly affects the destination, not unrelated siblings of its source.
     if (edge.to) seed(edge.to, `Incoming connection ${kind}`);
   }
+  // n8n v1 schedules populated main outputs by target position. Compare common
+  // targets across all source outputs; static exports cannot establish co-activation.
+  const branchOrderChanges = [];
+  if (!(before.settings?.executionOrder === 'v0' && after.settings?.executionOrder === 'v0')) {
+    const validPosition = node => Array.isArray(node.position) && node.position.length === 2 && Number.isFinite(node.position[0]) && Number.isFinite(node.position[1]);
+    const order = (a, b) => Math.sign(a.position[1] - b.position[1]) || Math.sign(a.position[0] - b.position[0]);
+    const targets = (workflow, source, names) => new Set((workflow.connections[source]?.main || []).flat().filter(edge => edge.type === 'main').map(edge => names.get(edge.node)).filter(Boolean));
+    let incompletePositions = false;
+    pairs.forEach(([a, b], sourceIndex) => {
+      if (!a || !b) return;
+      const oldTargets = targets(before, a.name, beforeKeys), newTargets = targets(after, b.name, afterKeys);
+      const common = [...oldTargets].filter(key => newTargets.has(key));
+      if (common.length < 2) return;
+      const affected = new Set();
+      for (let i = 0; i < common.length; i++) for (let j = i + 1; j < common.length; j++) {
+        const first = pairs[Number(common[i].slice(5))], second = pairs[Number(common[j].slice(5))];
+        if (![...first, ...second].every(node => node && validPosition(node))) { incompletePositions = true; continue; }
+        if (order(first[0], second[0]) !== order(first[1], second[1])) { affected.add(common[i]); affected.add(common[j]); }
+      }
+      if (affected.size) branchOrderChanges.push({ sourceKey: `node:${sourceIndex}`, targetKeys: [...affected] });
+    });
+    const affectedKeys = new Set(branchOrderChanges.flatMap(change => change.targetKeys));
+    for (const key of affectedKeys) {
+      seed(key, 'Potential branch execution order changed');
+      const [a, b] = pairs[Number(key.slice(5))];
+      // An unmoved sibling is affected, but its coordinates did not change.
+      if (a.position[0] === b.position[0] && a.position[1] === b.position[1]) continue;
+      let change = changesByKey.get(key);
+      if (!change) {
+        change = { kind: 'changed', ...labels.get(key), fields: [], ...(includeValues ? { details: [] } : {}) };
+        changes.push(change); changesByKey.set(key, change);
+      }
+      recordChange(a.position, b.position, 'position', change.fields, change.details);
+    }
+    if (incompletePositions) warnings.push('Some common main-branch targets have missing or invalid canvas positions. Their potential execution-order changes could not be compared; no default coordinates or order were assumed.');
+    if (branchOrderChanges.length) {
+      warnings.push('Relative canvas order changed among common main-branch targets (including ties). Under n8n v1 this may affect execution order only when the relevant outputs produce data; static comparison does not establish which branches run together or their actual execution order.');
+      if (![before, after].every(workflow => ['v0', 'v1'].includes(workflow.settings?.executionOrder))) warnings.push('Execution order is missing or unrecognized in at least one export. Confirm the effective executionOrder on the target instance before interpreting the position-related risk; v1 is not assumed.');
+    }
+  }
   if (unresolved) warnings.push('Some connection endpoints or literal expression references could not be resolved to a node. Impact may be incomplete.');
   const impacts = new Map([...seeds].map(([key, reasons]) => [key, new Set(reasons)]));
   const queue = [...seeds.keys()];
@@ -169,6 +209,7 @@ export function analyze(beforeInput, afterInput, { includeValues = false } = {})
   const checks = [];
   const touchedEdges = [...connections.added, ...connections.removed];
   function addCheck(id, title, detail, nodeNames = []) { checks.push({ id, title, detail, nodeNames }); }
+  for (const change of branchOrderChanges) addCheck(`branch-order:${change.sourceKey}`, 'Verify potential branch execution order', 'Confirm the effective executionOrder in both versions on the target instance. With v1, use controlled fixtures that make the relevant branches produce data together where possible. Observe and record actual branch order, including coordinate ties, and check ordering of shared external writes and dependent reads. Compare both versions; separately test mutually exclusive outputs without assuming they run together. This report does not run workflows.', [labels.get(change.sourceKey).nodeName, ...change.targetKeys.map(key => labels.get(key).nodeName)]);
   let hasCode = false, hasSubworkflow = false, hasDynamic = false;
   function scanDynamic(value) {
     if (typeof value === 'string' && value.includes('{{')) {

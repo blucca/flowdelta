@@ -145,3 +145,124 @@ test('form webhookId changes are reportable without a parameter-path change', ()
   assert.ok(!JSON.stringify(r).includes('old-form'));
   assert.equal(analyze(a,b,{includeValues:true}).changes[0].details[0].after.value,'new-form');
 });
+
+const branching = (executionOrder = 'v1') => w([
+  n('Source', {}, { position: [0, 0] }),
+  n('Upper', {}, { position: [100, 100] }),
+  n('Lower', {}, { position: [100, 200] }),
+  n('Output', {}, { position: [400, 100] }),
+], { Source: { main: [[edge('Upper'), edge('Lower')]] }, Upper: { main: [[edge('Output')]] } }, { settings: executionOrder === undefined ? {} : { executionOrder } });
+
+test('v1 relative branch movement changes only moved node, seeds both targets and downstream', () => {
+  const a = branching(), b = clone(a); b.nodes[1].position[1] = 300;
+  const r = analyze(a,b);
+  assert.equal(r.summary.changed,1); assert.deepEqual(r.changes[0].fields,['position']);
+  assert.equal(r.changes[0].nodeName,'Upper');
+  assert.deepEqual(new Set(r.impacted.map(node=>node.nodeName)),new Set(['Upper','Lower','Output']));
+  const check = r.checks.find(check=>check.id.startsWith('branch-order:'));
+  assert.deepEqual(check.nodeNames,['Source','Upper','Lower']);
+  assert.match(check.detail,/produce data together/); assert.match(check.detail,/shared external writes/);
+  assert.match(check.detail,/does not run workflows/);
+});
+test('relative ordering compares x only when y ties, including ties entered and left', () => {
+  const a = branching(); a.nodes[2].position = [200,100];
+  const b = clone(a); b.nodes[1].position[0] = 300;
+  assert.equal(analyze(a,b).summary.changed,1);
+  const tied = clone(a); tied.nodes[1].position = [200,100];
+  assert.equal(analyze(a,tied).summary.changed,1);
+  assert.equal(analyze(tied,a).summary.changed,1);
+  const stillTied = clone(tied); stillTied.nodes[1].position = stillTied.nodes[2].position = [800,900];
+  assert.equal(analyze(tied,stillTied).summary.changed,0);
+});
+test('pure branch layout and source movement preserving relative order stay ignored', () => {
+  const a = branching(), b = clone(a);
+  b.nodes[0].position = [900,900]; b.nodes[1].position = [800,120]; b.nodes[2].position = [-500,220];
+  assert.equal(analyze(a,b).summary.changed,0); assert.equal(analyze(a,b).summary.impacted,0);
+  const translated = clone(a); translated.nodes.forEach(node=>{node.position[0]+=50; node.position[1]+=500;});
+  assert.equal(analyze(a,translated).summary.changed,0);
+});
+test('shared source targets across distinct main outputs are potentially ordered', () => {
+  const a = branching(); a.connections.Source.main = [[edge('Upper')],[edge('Lower')]];
+  const b = clone(a); b.nodes[1].position[1] = 300;
+  const r = analyze(a,b); assert.equal(r.summary.changed,1);
+  assert.match(r.checks.find(check=>check.id.startsWith('branch-order:')).detail,/mutually exclusive/);
+});
+test('one target, duplicate edges and AI channels do not create a main branch-order comparison', () => {
+  for (const channels of [
+    {main:[[edge('Upper')]]},
+    {main:[[edge('Upper'),edge('Upper')]]},
+    {main:[[edge('Upper')]],ai_tool:[[edge('Lower','ai_tool')]]},
+  ]) {
+    const a = branching(); a.connections.Source = channels;
+    const b = clone(a); b.nodes[1].position[1] = 300;
+    assert.equal(analyze(a,b).summary.changed,0);
+    assert.ok(!analyze(a,b).checks.some(check=>check.id.startsWith('branch-order:')));
+  }
+});
+test('explicit v0 in both versions skips position comparison and missing-position warnings', () => {
+  const a = branching('v0'), b = clone(a); b.nodes[1].position[1] = 300;
+  assert.equal(analyze(a,b).summary.changed,0);
+  delete b.nodes[1].position;
+  assert.ok(!analyze(a,b).warnings.some(warning=>/missing or invalid canvas positions|Relative canvas order/.test(warning)));
+});
+test('missing and unknown executionOrder remain conditional rather than assumed v1', () => {
+  for (const settings of [{},{executionOrder:'future'}]) {
+    const a = branching(); a.settings=settings;
+    const b = clone(a); b.nodes[1].position[1]=300;
+    const r = analyze(a,b); assert.equal(r.summary.changed,1);
+    assert.ok(r.warnings.some(warning=>/Confirm the effective executionOrder/.test(warning) && /v1 is not assumed/.test(warning)));
+  }
+});
+test('v0 to v1 setting change still permits branch risk and retains global setting impact', () => {
+  const a = branching('v0'), b = clone(a); b.settings.executionOrder='v1'; b.nodes[1].position[1]=300;
+  const r = analyze(a,b); assert.equal(r.summary.changed,1); assert.equal(r.summary.impacted,4);
+  assert.ok(r.checks.some(check=>check.id==='settings'));
+  assert.ok(r.checks.some(check=>check.id.startsWith('branch-order:')));
+});
+test('missing and malformed positions warn without inventing order', () => {
+  for (const position of [undefined, null, [0], Array(2), ['0',100], [Infinity,100], [0,NaN], [0,100,200]]) {
+    const a = branching(), b = clone(a); b.nodes[1].position=position;
+    const r = analyze(a,b); assert.equal(r.summary.changed,0);
+    assert.ok(r.warnings.some(warning=>warning.includes('missing or invalid canvas positions')));
+    assert.ok(!r.checks.some(check=>check.id.startsWith('branch-order:')));
+  }
+});
+test('valid target pairs can still report order changes when another target has no position', () => {
+  const a = branching(); a.nodes.push(n('Unknown')); a.connections.Source.main[0].push(edge('Unknown'));
+  const b = clone(a); b.nodes[1].position[1]=300;
+  const r = analyze(a,b); assert.equal(r.summary.changed,1);
+  assert.ok(r.warnings.some(warning=>warning.includes('missing or invalid canvas positions')));
+  assert.ok(!r.impacted.some(node=>node.nodeName==='Unknown'));
+});
+test('branch matching follows stable IDs through source and target renames', () => {
+  const a = branching(), b = clone(a);
+  b.nodes[0].name='New Source'; b.nodes[1].name='New Upper'; b.nodes[1].position[1]=300;
+  b.connections['New Source']=b.connections.Source; delete b.connections.Source;
+  b.connections['New Source'].main[0][0].node='New Upper';
+  b.connections['New Upper']=b.connections.Upper; delete b.connections.Upper;
+  const r = analyze(a,b);
+  assert.deepEqual(r.changes.find(change=>change.nodeName==='New Upper').fields,['name','position']);
+  assert.equal(r.summary.connectionsAdded,0); assert.equal(r.summary.connectionsRemoved,0);
+  assert.ok(r.checks.find(check=>check.id.startsWith('branch-order:')).nodeNames.includes('New Upper'));
+});
+test('new or removed targets use connection impact without inventing historical position order', () => {
+  const a = branching(); a.connections.Source.main[0]=[edge('Upper')];
+  const b = clone(a); b.connections.Source.main[0].push(edge('Lower')); b.nodes[1].position[1]=300;
+  const r = analyze(a,b); assert.equal(r.summary.connectionsAdded,1); assert.equal(r.summary.changed,0);
+  assert.ok(!r.checks.some(check=>check.id.startsWith('branch-order:')));
+});
+test('branch coordinates are omitted by default, opt-in details are exact and inputs stay unmodified', () => {
+  const a = branching(), b = clone(a); a.nodes[1].position=[7312345,100]; b.nodes[1].position=[9876543,300];
+  const saved=JSON.stringify([a,b]), plain=analyze(a,b), detailed=analyze(a,b,{includeValues:true});
+  assert.ok(!JSON.stringify(plain).includes('7312345')); assert.ok(!JSON.stringify(plain).includes('9876543'));
+  assert.deepEqual(detailed.changes[0].details.find(detail=>detail.path==='position'),{
+    path:'position',before:{present:true,value:[7312345,100]},after:{present:true,value:[9876543,300]},
+  });
+  assert.equal(JSON.stringify([a,b]),saved);
+});
+test('only one explicit v0 does not suppress a position risk with unknown other execution order', () => {
+  const a = branching('v0'), b = clone(a); delete b.settings.executionOrder; b.nodes[1].position[1]=300;
+  const r = analyze(a,b); assert.equal(r.summary.changed,1);
+  assert.ok(r.warnings.some(warning=>warning.includes('v1 is not assumed')));
+  assert.ok(r.changes.some(change=>change.kind==='settings'));
+});

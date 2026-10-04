@@ -73,22 +73,69 @@ function render() {
   }
   $('impact').replaceChildren(...result.impacted.map(item => {const node = el('div',undefined,'impact-node');node.append(el('strong',item.nodeName),el('p',item.reasons.join(' · ')));return node;}));
   if(!result.impacted.length) $('impact').append(el('p','No downstream nodes identified from the exported connections. Review workflow-level settings separately.','empty'));
+  renderChecks(); $('report').hidden = false; $('status').textContent = 'Handoff report ready. Edit the acceptance plan, add business checks, and record test outcomes.';
+}
+function renderChecks() {
   $('checks').replaceChildren();
   result.checks.forEach((check,index) => {
-    const box = el('div',undefined,'check'), head = el('div',undefined,'check-head'), select = el('select'); select.setAttribute('aria-label',`${check.title}: result`);
+    const outcome = acceptance[index];
+    const box = el('div',undefined,'check'), head = el('div',undefined,'check-head'), select = el('select');
+    const heading = el('h4',`${index + 1}. ${check.title || 'Untitled check'}`);
+    select.setAttribute('aria-label',`${check.title || 'Untitled check'}: result`);
     for(const [value,label] of [['not run','Not run'],['pass','Pass'],['fail','Fail']]) {const option = el('option',label); option.value = value;select.append(option);}
-    select.value = acceptance[index].status; select.addEventListener('change',() => {acceptance[index].status = select.value; progress();});
-    head.append(el('h4',`${index + 1}. ${check.title}`),select);
-    const label = el('label','Observed result / evidence','check-note'), note = el('textarea'); note.maxLength=6000;note.placeholder='Test input, observed outcome, evidence reference…';note.value=acceptance[index].notes;
-    note.addEventListener('input',()=> acceptance[index].notes=note.value);label.append(note);
-    box.append(head,el('p',check.detail)); if(check.nodeNames?.length) box.append(el('p',`Affected nodes: ${check.nodeNames.join(', ')}`)); box.append(label);$('checks').append(box);
+    select.value = outcome.status;
+    const noteLabel = el('label',undefined,'check-note'), noteCaption = el('span');
+    const review = el('p',undefined,'check-review'); review.setAttribute('role','status');
+    function reviewState() {
+      review.hidden = !outcome.reviewRequired;
+      review.textContent = `Plan changed — result is Not run. ${outcome.notes.trim() ? 'Previous observations are retained and need review. ' : ''}Run the revised check, then record its outcome again.`;
+      noteCaption.textContent = outcome.reviewRequired && outcome.notes.trim() ? 'Previous observations / evidence — review required' : 'Observed result / evidence';
+    }
+    select.addEventListener('change',() => {outcome.status = select.value;if(select.value !== 'not run') outcome.reviewRequired = false;reviewState();progress();});
+    head.append(heading,select);box.append(head);
+    function planField(caption,field,value,rows) {
+      const label = el('label',caption,`check-note check-plan-field${field === 'title' ? ' check-title-field' : ''}`);
+      const control = el(rows ? 'textarea' : 'input'); control.value=value;control.maxLength=field === 'title' ? 300 : 6000;
+      if(rows) control.rows=rows;
+      control.dataset.field=field;
+      if(field === 'detail') control.placeholder='Input / fixture:\nSteps to run:\nExpected result:';
+      if(field === 'nodeNames') control.placeholder='One node name per line; leave blank for workflow-wide checks';
+      control.addEventListener('input',() => {
+        check[field] = field === 'nodeNames' ? control.value.split(/\r?\n/).map(name=>name.trim()).filter(Boolean) : control.value;
+        if(outcome.status !== 'not run' || outcome.notes.trim()) outcome.reviewRequired = true;
+        outcome.status='not run';select.value='not run';
+        heading.textContent=`${index + 1}. ${check.title || 'Untitled check'}`;
+        select.setAttribute('aria-label',`${check.title || 'Untitled check'}: result`);
+        reviewState();progress();
+      });
+      label.append(control);box.append(label);
+    }
+    planField('Check title','title',check.title);
+    planField('Test plan — input, steps & expected result','detail',check.detail,4);
+    planField('Affected nodes — one per line; blank means workflow-wide','nodeNames',check.nodeNames.join('\n'),2);
+    const note = el('textarea'); note.maxLength=6000;note.rows=3;note.dataset.field='observations';note.placeholder='After executing: actual outcome, evidence reference, execution ID…';note.value=outcome.notes;
+    note.addEventListener('input',()=> {outcome.notes=note.value;reviewState();});noteLabel.append(noteCaption,note);
+    const remove = el('button','Remove check','button secondary remove-check');remove.type='button';remove.setAttribute('aria-label',`Remove check ${index + 1}`);
+    remove.addEventListener('click',()=> {
+      result.checks.splice(index,1);acceptance.splice(index,1);renderChecks();
+      const remaining = $('checks').querySelectorAll('.remove-check');(remaining[Math.min(index,remaining.length-1)] || $('add-check')).focus();
+      $('status').textContent='Check removed from the acceptance plan.';
+    });
+    reviewState();box.append(review,noteLabel,remove);$('checks').append(box);
   });
-  if(!result.checks.length) $('checks').append(el('p','No change-specific checks generated. Run your standard regression suite before release.','empty'));
-  progress(); $('report').hidden = false; $('status').textContent = 'Handoff report ready. Add client-facing explanations and record test outcomes.';
+  if(!result.checks.length) $('checks').append(el('p','No acceptance checks yet. Add a business check or use your standard regression suite before release.','empty'));
+  progress();
 }
+$('add-check').addEventListener('click',()=>{
+  if(!result)return;
+  result.checks.push({id:'custom',title:'New business check',detail:'',nodeNames:[]});
+  acceptance.push({status:'not run',notes:'',reviewRequired:false});renderChecks();
+  const title=$('checks').lastElementChild.querySelector('[data-field="title"]');title.focus();title.select();
+  $('status').textContent='Business check added. Define its input, steps and expected result before running it.';
+});
 function progress() {const counts = {pass:0,fail:0,'not run':0};acceptance.forEach(c=>counts[c.status]++);$('check-progress').textContent=`${counts.pass} pass · ${counts.fail} fail · ${counts['not run']} not run`;}
 function build() {
-  $('error').hidden=true; result=null; $('report').hidden=true;
+  $('error').hidden=true; result=null; acceptance=[]; explanations=[]; sharedValues=[]; $('report').hidden=true;
   try {
     result=analyze(parse('before'),parse('after'), {includeValues: true});
     if(demoLoaded === 'lead') { result.warnings.push('Synthetic demo only. CRM URL and Slack channel are placeholders; configure services and credentials before attempting execution.'); for(const check of result.checks) { if(check.id.startsWith('branch-boundaries:')) check.detail += ' For this demo: compare scores 59, 60, 61, 74, 75 and 76. In the new version, scores below 75 should follow nurture; 75 and above should create a CRM lead.'; if(check.id.startsWith('added:')) check.detail='With a configured test Slack channel, run a qualifying lead and confirm one sales alert arrives after the CRM write succeeds. Verify the message contains no unintended customer data.'; } }
@@ -101,7 +148,7 @@ function build() {
       }
       result.checks.push({id:'case-render-retries', title:'Check the failed-render retry loop', detail:'Case-specific review: the FAILED branch returns to renderShort; the non-completed path returns to polling. With stubbed responses, exercise repeated FAILED and non-terminal responses, count render POSTs, and verify retry/polling limits and escalation against the intended policy. Record whether duplicate renders occur; the graph alone does not establish API idempotency or a retry bound.', nodeNames:['isError ?', 'iscompleted ?', 'renderShort', 'Wait1']});
     }
-    acceptance=result.checks.map(()=>({status:'not run',notes:''}));
+    acceptance=result.checks.map(()=>({status:'not run',notes:'',reviewRequired:false}));
     explanations=result.changes.map(change=>demoLoaded ? demoExplanation(change) : '');
     sharedValues=result.changes.map(()=>false);
     render();$('report').scrollIntoView({behavior:'smooth',block:'start'});
@@ -150,7 +197,13 @@ function markdown() {
   result.impacted.forEach(n=>lines.push(`- **${md(n.nodeName)}:** ${n.reasons.map(md).join('; ')}`));
   if(!result.impacted.length)lines.push('No downstream nodes identified from exported connections.');
   lines.push('','## Acceptance plan','','Tests are executed by the delivery team in their n8n environment. The comparison tool does not run tests.','');
-  result.checks.forEach((c,i)=>lines.push(`### ${i+1}. ${md(c.title)}`,`**Status:** ${acceptance[i].status.toUpperCase()}`,md(c.detail),`**Affected nodes:** ${c.nodeNames.map(md).join(', ') || 'Workflow-wide'}`,`**Observed result / evidence:** ${md(acceptance[i].notes || 'No observations recorded.')}`,''));
+  result.checks.forEach((c,i)=> {
+    const outcome=acceptance[i];
+    lines.push(`### ${i+1}. ${md(c.title || 'Untitled check')}`,`**Status:** ${outcome.status.toUpperCase()}`,'',`**Test plan — input, steps & expected result:**`,md(c.detail || 'Not specified — define this check before execution.'),'',`**Affected nodes:** ${c.nodeNames.map(md).join(', ') || 'Workflow-wide'}`);
+    if(outcome.reviewRequired) lines.push('**Review required:** Plan changed; the result was reset to NOT RUN. Retained observations must be reviewed against the revised plan.');
+    lines.push(`**${outcome.reviewRequired && outcome.notes.trim() ? 'Previous observations / evidence — review required' : 'Observed result / evidence'}:** ${md(outcome.notes || 'No observations recorded.')}`,'');
+  });
+  if(!result.checks.length)lines.push('No acceptance checks recorded. Add business checks or run your standard regression suite before release.','');
   lines.push('## Analysis limitations','',...result.warnings.map(w=>`- ${md(w)}`),'','## Sharing notes','',`${sharedValues.some(Boolean) ? 'This report includes exact values explicitly selected by its author.' : 'Raw workflow values were omitted.'} Credential references and pinned data are omitted. Names, field paths, explanations and notes may contain business information. Review before sharing.`,'','Generated locally with FlowDelta.');
   return lines.join('\n');
 }
@@ -158,7 +211,7 @@ $('download').addEventListener('click',()=>{if(!result)return;const url=URL.crea
 $('print').addEventListener('click',()=>{if(result)window.print();});
 window.addEventListener('beforeprint',()=>{
   document.querySelectorAll('.print-value').forEach(copy=>copy.remove());
-  document.querySelectorAll('#report input:not([type="checkbox"]), #report textarea, #report select').forEach(control=>{const copy=el('div',control.tagName==='SELECT' ? control.selectedOptions[0].textContent : (control.value || 'Not provided'),'print-value');control.after(copy);});
+  document.querySelectorAll('#report input:not([type="checkbox"]), #report textarea, #report select').forEach(control=>{const fallback=control.dataset.field === 'nodeNames' ? 'Workflow-wide' : control.dataset.field === 'detail' ? 'Not specified — define this check before execution.' : control.dataset.field === 'observations' ? 'No observations recorded.' : 'Not provided';const copy=el('div',control.tagName==='SELECT' ? control.selectedOptions[0].textContent : (control.value || fallback),'print-value');control.after(copy);});
   if(result) document.querySelectorAll('#changes .change').forEach((card, index) => {
     if(sharedValues[index]) for(const item of result.changes[index].details || []) card.append(el('div', `${item.path}\nPrevious: ${valueText(item.before)}\nNew: ${valueText(item.after)}`, 'print-value'));
   });
