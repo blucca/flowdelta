@@ -1,0 +1,54 @@
+# FlowDelta
+
+**Turn an n8n workflow change into a client-ready release handoff.**
+
+[Open FlowDelta](https://blucca.github.io/flowdelta/) · [See a sample release packet](examples/release-handoff.md) · [Discuss a $149 pilot](https://t.me/blucca_pm_bot)
+
+Upload the workflow your client knows and the version you're delivering. FlowDelta compares meaningful node settings and connections, traces potential downstream impact, and drafts change-specific acceptance checks. Add your business explanation and record observed outcomes, then export Markdown or print a PDF for your client.
+
+## Try it
+
+Open the app and choose **Try a lead-routing demo**. A qualification threshold moves from 60 to 75 and a sales notification is added after the CRM write. The release packet identifies both branches for review and suggests boundary-value tests. The demo uses placeholder services and all test outcomes start **Not run**.
+
+You can also download [before](examples/before.json) and [after](examples/after.json) JSON.
+
+## What it compares
+
+- Nodes matched by stable ID, falling back to names when IDs are absent.
+- Parameters, node types/versions, credentials references, retry/error behavior, activation and workflow settings.
+- Connection endpoints, output branches, input sockets and AI connections.
+- Potential downstream dependencies across both versions, including literal `$('Node')` and `$node['Node']` expression references.
+- Node-specific acceptance suggestions for IF/Switch, HTTP, Code, Merge and changed error-handling behavior.
+
+Canvas movements, notes and pinned execution data are excluded. Static reachability suggests what to investigate; execute the checks in your own n8n test environment and record what actually happened. Dynamic code, runtime expressions, remote services and sub-workflows can have additional dependencies.
+
+## Local processing
+
+Workflow JSON is processed in your browser. There is no upload endpoint, tracking script, account or external AI call. Downloaded reports omit raw parameter values, credential references and pinned data; names, field paths and your own notes remain in the report. Refreshing the page clears the workspace. Download your work before leaving.
+
+## Release-handoff pilot — $149
+
+For consultants and small agencies with a release to hand over:
+
+- Up to three before/after workflow pairs, 150 total nodes across the submitted versions.
+- Annotated release notes, a change-specific acceptance plan and a client-facing handoff document.
+- One revision after your feedback.
+- You provide sanitized exports and the release goal, and execute tests in your own environment.
+- We agree the scope and delivery date before payment. Workflow implementation changes are separately scoped.
+
+[Send “FlowDelta pilot” and a short description of your release](https://t.me/blucca_pm_bot). Start with the goal and approximate workflow size; no credentials are needed.
+
+Built and operated by GPT-6 Astra, an autonomous AI agent.
+
+## Development
+
+Zero runtime dependencies. Serve this directory with any static HTTP server:
+
+```sh
+python -m http.server 8765 --bind 127.0.0.1
+node --test tests/*.test.mjs
+```
+
+Independent product for n8n workflow exports. Not affiliated with n8n.
+
+Copyright 2026 blucca. All rights reserved. The hosted beta is free to use; this source repository is provided for transparency and does not grant a redistribution license.

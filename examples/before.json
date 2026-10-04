@@ -1,0 +1,115 @@
+{
+  "name": "Inbound leads \u00b7 current",
+  "nodes": [
+    {
+      "id": "webhook",
+      "name": "Lead received",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "parameters": {
+        "path": "demo-lead",
+        "httpMethod": "POST",
+        "responseMode": "onReceived"
+      }
+    },
+    {
+      "id": "qualify",
+      "name": "Qualify lead",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "score",
+              "leftValue": "={{ $json.body.score }}",
+              "rightValue": 60,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      }
+    },
+    {
+      "id": "crm",
+      "name": "Create CRM lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        -100
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://crm.example.invalid/leads",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}"
+      }
+    },
+    {
+      "id": "archive",
+      "name": "Keep for nurture",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        480,
+        100
+      ],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "Lead received": {
+      "main": [
+        [
+          {
+            "node": "Qualify lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualify lead": {
+      "main": [
+        [
+          {
+            "node": "Create CRM lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Keep for nurture",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}
