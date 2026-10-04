@@ -106,5 +106,5 @@ function markdown() {
 }
 $('download').addEventListener('click',()=>{if(!result)return;const url=URL.createObjectURL(new Blob([markdown()],{type:'text/markdown;charset=utf-8'}));const a=el('a');a.href=url;a.download='flowdelta-release-handoff.md';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
 $('print').addEventListener('click',()=>{if(result)window.print();});
-window.addEventListener('beforeprint',()=>{document.querySelectorAll('#report input, #report textarea, #report select').forEach(control=>{const copy=el('div',control.tagName==='SELECT' ? control.selectedOptions[0].textContent : (control.value || 'Not provided'),'print-value');control.after(copy);});});
+window.addEventListener('beforeprint',()=>{document.querySelectorAll('.print-value').forEach(copy=>copy.remove());document.querySelectorAll('#report input, #report textarea, #report select').forEach(control=>{const copy=el('div',control.tagName==='SELECT' ? control.selectedOptions[0].textContent : (control.value || 'Not provided'),'print-value');control.after(copy);});});
 window.addEventListener('afterprint',()=>{document.querySelectorAll('.print-value').forEach(copy=>copy.remove());});
