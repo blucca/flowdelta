@@ -106,3 +106,42 @@ test('uncertainty warnings only name dependency categories actually present', ()
   const dynamic=w([n('A',{x:'={{ $( $json.nodeName ).item.json.x }}'})]); assert.ok(analyze(dynamic,dynamic).warnings.some(w=>w.includes('Dynamic node-name')));
   const sub=w([n('Call',{}, {type:'n8n-nodes-base.executeWorkflow'})]); assert.ok(analyze(sub,sub).warnings.some(w=>w.includes('Sub-workflow')));
 });
+test('opt-in value evidence preserves missing, null and scalar changes', () => {
+  const a=w([n('A',{threshold:60,removeMe:'old',nullable:1,items:['a','b']})]);
+  const b=w([n('A',{threshold:75,added:false,nullable:null,items:['a']})]);
+  const r=analyze(a,b,{includeValues:true}), details=r.changes[0].details;
+  const find=path=>details.find(d=>d.path===path);
+  assert.deepEqual(find('parameters["threshold"]'),{path:'parameters["threshold"]',before:{present:true,value:60},after:{present:true,value:75}});
+  assert.deepEqual(find('parameters["removeMe"]').after,{present:false});
+  assert.deepEqual(find('parameters["added"]').before,{present:false});
+  assert.deepEqual(find('parameters["nullable"]').after,{present:true,value:null});
+  assert.deepEqual(find('parameters["items"][1]').after,{present:false});
+  assert.equal(analyze(a,b).changes[0].details,undefined);
+});
+test('value opt-in excludes credential references and pin data, including added nodes', () => {
+  const before=w([n('A',{}, {credentials:{http:{id:'SECRET_OLD'}}})]);
+  const after=w([n('A',{publicField:'visible'}, {credentials:{http:{id:'SECRET_NEW'}}}),n('B',{}, {credentials:{smtp:{id:'SECRET_ADDED'}}})],{}, {pinData:{A:'SECRET_PIN'},settings:{timezone:'UTC'},active:true});
+  const r=analyze(before,after,{includeValues:true}), json=JSON.stringify(r);
+  for(const secret of ['SECRET_OLD','SECRET_NEW','SECRET_ADDED','SECRET_PIN']) assert.ok(!json.includes(secret));
+  assert.ok(json.includes('visible'));
+  assert.ok(r.changes.find(c=>c.kind==='settings').details.some(d=>d.after.value==='UTC'));
+  assert.equal(r.changes.find(c=>c.kind==='metadata').details[0].after.value,true);
+  assert.ok(r.changes.find(c=>c.kind==='added').details.some(d=>d.path==='type'));
+});
+test('string-enum migration suggests cases rather than numerical boundaries', () => {
+  const params=(field,value)=>({conditions:{conditions:[{leftValue:`={{ $json.${field} }}`,rightValue:value,operator:{type:'string',operation:'equals'}}]}});
+  const r=analyze(w([n('Done?',params('type','done'),{type:'n8n-nodes-base.if'})]),w([n('Done?',params('status','COMPLETED'),{type:'n8n-nodes-base.if'})]));
+  assert.ok(r.checks.some(c=>c.id.startsWith('branch-cases:')&&c.detail.includes('missing/null')));
+  assert.ok(!r.checks.some(c=>c.id.startsWith('branch-boundaries:')));
+  assert.ok(!JSON.stringify(r).includes('COMPLETED'));
+});
+test('form webhookId changes are reportable without a parameter-path change', () => {
+  const a=w([n('Submit Form',{}, {type:'n8n-nodes-base.formTrigger',typeVersion:2.2,webhookId:'old-form'}),n('Deliver')],{'Submit Form':{main:[[edge('Deliver')]]}});
+  const b=clone(a);b.nodes[0].webhookId='new-form';
+  const r=analyze(a,b);
+  assert.equal(r.summary.changed,1);assert.equal(r.summary.impacted,2);
+  assert.deepEqual(r.changes[0].fields,['webhookId']);
+  assert.ok(r.checks.some(c=>c.id.startsWith('webhook-id:')));
+  assert.ok(!JSON.stringify(r).includes('old-form'));
+  assert.equal(analyze(a,b,{includeValues:true}).changes[0].details[0].after.value,'new-form');
+});

@@ -1,5 +1,5 @@
 /* FlowDelta — Copyright 2026 blucca. All rights reserved. */
-const semanticFields = ['parameters', 'type', 'typeVersion', 'disabled', 'retryOnFail', 'maxTries', 'waitBetweenTries', 'onError', 'continueOnFail', 'alwaysOutputData', 'executeOnce', 'credentials'];
+const semanticFields = ['parameters', 'type', 'typeVersion', 'webhookId', 'disabled', 'retryOnFail', 'maxTries', 'waitBetweenTries', 'onError', 'continueOnFail', 'alwaysOutputData', 'executeOnce', 'credentials'];
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 const own = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
 
@@ -41,18 +41,23 @@ export function parseWorkflow(input) {
   return workflow;
 }
 
-function changedPaths(a, b, path, result) {
+function recordChange(a, b, path, result, details) {
+  result.push(path);
+  if (details) details.push({ path, before: { present: a !== undefined, ...(a !== undefined ? { value: a } : {}) }, after: { present: b !== undefined, ...(b !== undefined ? { value: b } : {}) } });
+}
+
+function changedPaths(a, b, path, result, details) {
   if (Object.is(a, b)) return;
   if (Array.isArray(a) && Array.isArray(b)) {
-    if (a.length !== b.length) result.push(`${path}.length`);
-    for (let i = 0; i < Math.max(a.length, b.length); i++) changedPaths(a[i], b[i], `${path}[${i}]`, result);
+    if (a.length !== b.length) recordChange(a.length, b.length, `${path}.length`, result, details);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) changedPaths(a[i], b[i], `${path}[${i}]`, result, details);
   } else if (object(a) && object(b)) {
     for (const key of [...new Set([...Object.keys(a), ...Object.keys(b)])].sort()) {
       const next = `${path}[${JSON.stringify(key)}]`;
-      if (!own(a, key) || !own(b, key)) result.push(next);
-      else changedPaths(a[key], b[key], next, result);
+      if (!own(a, key) || !own(b, key)) recordChange(a[key], b[key], next, result, details);
+      else changedPaths(a[key], b[key], next, result, details);
     }
-  } else result.push(path);
+  } else recordChange(a, b, path, result, details);
 }
 
 function expressionReferences(value, refs = new Set()) {
@@ -64,9 +69,16 @@ function expressionReferences(value, refs = new Set()) {
   return refs;
 }
 
-export function analyze(beforeInput, afterInput) {
+function conditionOperators(value, operators = []) {
+  if (!value || typeof value !== 'object') return operators;
+  if (object(value.operator) && typeof value.operator.type === 'string') operators.push(value.operator.type);
+  for (const [key, child] of Object.entries(value)) if (key !== 'operator') conditionOperators(child, operators);
+  return operators;
+}
+
+export function analyze(beforeInput, afterInput, { includeValues = false } = {}) {
   const before = parseWorkflow(beforeInput), after = parseWorkflow(afterInput);
-  const warnings = ['Potential impact is a static estimate across both workflow versions, not execution validation. Scope: node parameters, type/version, credentials, execution flags, connections, workflow settings and activation; other metadata is ignored.'];
+  const warnings = ['Potential impact is a static estimate across both workflow versions, not execution validation. Scope: node parameters, type/version, webhook identifiers, credentials, execution flags, connections, workflow settings and activation; other metadata is ignored.'];
   const beforeKeys = new Map(), afterKeys = new Map(), pairs = [], taken = new Set();
   const afterById = new Map(after.nodes.filter(n => n.id).map(n => [n.id, n]));
   const afterByName = new Map(after.nodes.map(n => [n.name, n]));
@@ -93,26 +105,29 @@ export function analyze(beforeInput, afterInput) {
   const changes = [], seeds = new Map(), changesByKey = new Map();
   function seed(key, reason) { if (!seeds.has(key)) seeds.set(key, new Set()); seeds.get(key).add(reason); }
   pairs.forEach(([a, b], i) => {
-    const key = `node:${i}`, fields = [];
+    const key = `node:${i}`, fields = [], details = includeValues ? [] : undefined;
     let kind;
     if (!a) kind = 'added';
     else if (!b) kind = 'removed';
     else {
-      if (a.name !== b.name) fields.push('name');
-      for (const field of semanticFields) changedPaths(a[field], b[field], field, fields);
+      if (a.name !== b.name) recordChange(a.name, b.name, 'name', fields, details);
+      for (const field of semanticFields) changedPaths(a[field], b[field], field, fields, field === 'credentials' ? undefined : details);
       if (fields.length) kind = 'changed';
     }
-    if (kind) { const change = { kind, ...labels.get(key), fields }; changes.push(change); changesByKey.set(key, change); seed(key, `Node ${kind}`); }
+    if (details && (!a || !b)) for (const field of semanticFields.filter(field => field !== 'credentials')) changedPaths(a?.[field], b?.[field], field, [], details);
+    if (kind) { const change = { kind, ...labels.get(key), fields, ...(details ? { details } : {}) }; changes.push(change); changesByKey.set(key, change); seed(key, `Node ${kind}`); }
   });
-  const settingPaths = [];
-  changedPaths(before.settings || {}, after.settings || {}, 'settings', settingPaths);
+  const settingPaths = [], settingDetails = includeValues ? [] : undefined;
+  changedPaths(before.settings || {}, after.settings || {}, 'settings', settingPaths, settingDetails);
   if (settingPaths.length) {
-    changes.push({ kind: 'settings', nodeId: '', nodeName: 'Workflow settings', fields: settingPaths });
+    changes.push({ kind: 'settings', nodeId: '', nodeName: 'Workflow settings', fields: settingPaths, ...(settingDetails ? { details: settingDetails } : {}) });
     for (const key of labels.keys()) seed(key, 'Workflow settings changed');
   }
   const activationChanged = before.active !== after.active;
   if (activationChanged) {
-    changes.push({ kind: 'metadata', nodeId: '', nodeName: 'Workflow activation', fields: ['active'] });
+    const details = includeValues ? [] : undefined;
+    if (details) recordChange(before.active, after.active, 'active', [], details);
+    changes.push({ kind: 'metadata', nodeId: '', nodeName: 'Workflow activation', fields: ['active'], ...(details ? { details } : {}) });
     for (const key of labels.keys()) seed(key, 'Workflow activation changed');
   }
   const graph = new Map([...labels.keys()].map(key => [key, new Set()]));
@@ -189,7 +204,9 @@ export function analyze(beforeInput, afterInput) {
     let specialized = false;
     if ((params || runtime) && isType('if', 'switch')) {
       specialized = true;
-      check('branch-boundaries', 'Test old and new decision boundaries', 'For each changed condition, use inputs just below, equal to and just above both the old and new threshold where ordered comparisons apply. Also test missing/null values and type coercion. Confirm the selected output branch, fallback behavior and downstream item counts.');
+      const operators = [...conditionOperators(a?.parameters), ...conditionOperators(b?.parameters)];
+      if (operators.length && operators.every(type => type === 'string')) check('branch-cases', 'Test matching, non-matching and missing values', 'For each changed string condition, test values that match the previous rule, match the new rule, match neither, and are missing/null. Check case sensitivity, type handling and whether the referenced input field is present. Confirm the selected output branch, fallback behavior and downstream item counts.');
+      else check('branch-boundaries', 'Test old and new decision boundaries', 'For each changed condition, use inputs just below, equal to and just above both the old and new threshold where ordered comparisons apply. Also test missing/null values and type coercion. Confirm the selected output branch, fallback behavior and downstream item counts.');
     }
     if ((params || runtime) && isType('httprequest')) {
       specialized = true;
@@ -207,6 +224,7 @@ export function analyze(beforeInput, afterInput) {
     }
     if (params && !specialized) check('parameters', 'Verify modified parameter behavior', 'Use identical representative and empty/malformed input fixtures with both configurations. Compare output shape, item count and side effects for the reported parameter paths; inspect exact values locally.');
     if (fields.some(path => path.startsWith('credentials'))) check('credentials', 'Verify selected credential access', 'Confirm the selected credential resolves in the target environment, belongs to the intended account and has the required permissions. Use a controlled authentication check without exposing credential contents.');
+    if (fields.includes('webhookId')) check('webhook-id', 'Verify trigger URLs and callback routing', 'Confirm the changed webhook identifier in the target environment. For form/webhook triggers, check generated URLs, registration and incoming links; for other nodes, check whether the identifier is used for callbacks or waiting executions. Send a representative event and verify it reaches the intended workflow. A configured path may override the identifier.');
     if (fields.some(path => ['retryOnFail', 'maxTries', 'waitBetweenTries', 'onError', 'continueOnFail'].includes(path))) check('failure-path', 'Force a controlled failure', 'Use a fixture that fails predictably. Verify retry count and delay, final error routing, whether downstream nodes continue, and whether repeated attempts duplicate side effects. Also confirm the normal success path remains unchanged.');
     if (fields.some(path => ['disabled', 'alwaysOutputData', 'executeOnce'].includes(path))) check('execution-flags', 'Check empty and multiple-item execution', 'Test empty input, one item and multiple items. Verify whether the node runs or is bypassed, output item count and downstream behavior under the changed execution flags.');
     if (runtime && !isNew) check('node-version', 'Check node type and version compatibility', 'Run the same fixtures against the old and new node type/version. Confirm parameter interpretation, output schema and error behavior in the target n8n version.');

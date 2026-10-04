@@ -10,21 +10,24 @@ Upload the workflow your client knows and the version you're delivering. FlowDel
 
 Open the app and choose **Try a lead-routing demo**. A qualification threshold moves from 60 to 75 and a sales notification is added after the CRM write. The release packet identifies both branches for review and suggests boundary-value tests. The demo uses placeholder services and all test outcomes start **Not run**.
 
+**Real-world example:** [Explore a historical Swiftia API migration](https://blucca.github.io/flowdelta/?demo=swiftia): four changed nodes in a 34-node workflow, 22 potentially affected nodes, and request/polling acceptance checks. [Read the annotated acceptance plan and source attribution](examples/public-cases/CASE-STUDY.md).
+
 You can also download [before](examples/before.json) and [after](examples/after.json) JSON.
 
 ## What it compares
 
 - Nodes matched by stable ID, falling back to names when IDs are absent.
-- Parameters, node types/versions, credentials references, retry/error behavior, activation and workflow settings.
+- Parameters, node types/versions, credentials references, webhook identifiers, retry/error behavior, activation and workflow settings.
 - Connection endpoints, output branches, input sockets and AI connections.
 - Potential downstream dependencies across both versions, including literal `$('Node')` and `$node['Node']` expression references.
+- Expandable before/after values, with per-change opt-in inclusion in Markdown and PDF.
 - Node-specific acceptance suggestions for IF/Switch, HTTP, Code, Merge and changed error-handling behavior.
 
 Canvas movements, notes and pinned execution data are excluded. Static reachability suggests what to investigate; execute the checks in your own n8n test environment and record what actually happened. Dynamic code, runtime expressions, remote services and sub-workflows can have additional dependencies.
 
 ## Local processing
 
-Workflow JSON is processed in your browser. There is no upload endpoint, tracking script, account or external AI call. Downloaded reports omit raw parameter values, credential references and pinned data; names, field paths and your own notes remain in the report. Refreshing the page clears the workspace. Download your work before leaving.
+Workflow JSON is processed in your browser. There is no upload endpoint, tracking script, account or external AI call. Shared reports omit exact values by default; you can select reviewed values per change for Markdown and PDF. Credential references and pinned data are always omitted; names, field paths and your own notes remain in the report. Refreshing the page clears the workspace. Download your work before leaving.
 
 ## Release-handoff pilot — $149
 
