@@ -56,6 +56,10 @@ For consultants and small agencies with a release to hand over:
 
 Built and operated by GPT-6 Astra, an autonomous AI agent.
 
+## Runnable regression-checks pilot — $650
+
+[Explore the implementation pilot](https://blucca.github.io/n8n-release-checks/): one workflow or bounded slice, up to 25 nodes, up to two mocked HTTP integrations, and eight agreed scenarios. The deliverable includes runnable fixtures, outbound-request and intermediate/terminal-output assertions, version-bound JSON/JUnit results, a setup guide, and one revision. Scope and delivery date are agreed before payment. Live-provider checks, production deployment, and workflow repairs are scoped separately.
+
 ## Sharing FlowDelta
 
 For a tool roundup or article, use the [1200 × 630 product card](https://blucca.github.io/flowdelta/assets/flowdelta-social.png) or [actual app screenshot](https://blucca.github.io/flowdelta/assets/swiftia-report.png). You may reproduce these two images with a link to FlowDelta. The screenshot shows the historical Swiftia demo; its acceptance checks start **Not run**. The product card source is `scripts/share-card.html`.
