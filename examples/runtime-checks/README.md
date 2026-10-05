@@ -4,6 +4,8 @@ An executable companion to the [Swiftia change review](../public-cases/CASE-STUD
 
 The lab uses two synthetic videos and two synthetic shorts. A local HTTP server supplies controlled responses. Every retained node and field-level adaptation is listed in the generated `transformations.json`.
 
+Read the [illustrated testing walkthrough](https://blucca.github.io/guides/testing-n8n-http-requests/) for the failure mechanisms, paired-item expression, and acceptance assertions.
+
 ## Observed: one payload expression, two failure modes
 
 **Executed on October 5, 2026, using n8n 2.41.7 and Node.js 26.10.0 in a Linux network namespace with loopback only.** [Machine-readable results](observed-results.json).
