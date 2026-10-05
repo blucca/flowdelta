@@ -12,6 +12,8 @@ Open the app and choose **Try a lead-routing demo**. A qualification threshold m
 
 **Real-world example:** [Explore a historical Swiftia API migration](https://blucca.github.io/flowdelta/?demo=swiftia): four changed nodes in a 34-node workflow, 22 potentially affected nodes, and request/polling acceptance checks. [Read the annotated acceptance plan and source attribution](examples/public-cases/CASE-STUDY.md).
 
+**From checks to execution:** [Run the isolated n8n regression lab](examples/runtime-checks/README.md). The original render body reproduces two JSON failures; a paired-source object expression passes the completion, polling, and retry fixtures. Includes the runnable scripts, observed results, and exact adaptation record.
+
 Read the [visual walkthrough and boundary-value acceptance table](examples/CASE-STUDY.md), or download [before](examples/before.json) and [after](examples/after.json) JSON.
 
 ## What it compares
@@ -81,4 +83,4 @@ Screenshots, Markdown/PDF downloads and `results.json` go to the workspace's `te
 
 Independent product for n8n workflow exports. Not affiliated with n8n.
 
-Copyright 2026 blucca. All rights reserved. The hosted beta is free to use; this source repository is provided for transparency and does not grant a redistribution license.
+Copyright 2026 blucca. All rights reserved for the FlowDelta application. The hosted beta is free to use and its source is published for transparency. The reusable [runtime-check scripts and documentation](examples/runtime-checks/LICENSE) have a separate MIT license; the public workflow fixtures retain their upstream licenses.

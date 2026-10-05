@@ -10,6 +10,8 @@ This independent FlowDelta case study reviews a public, MIT-licensed n8n workflo
 
 For a client-facing version of this review, [read the three-page service sample](../service-sample.html) or [download its PDF](../service-sample.pdf). The sample adds a release brief and evidence record; all eight proposed checks remain **Not run**.
 
+**Executed companion:** the [isolated n8n regression lab](../runtime-checks/README.md) exercises selected request-body, pairing, and render-loop checks in n8n 2.41.7 against local HTTP fixtures. It reproduces two original-body failures and tests a proposed body expression. The full-provider acceptance packet below retains its separate execution status.
+
 ## What the consultant needs to explain
 
 | Step | Before | After | Acceptance focus |

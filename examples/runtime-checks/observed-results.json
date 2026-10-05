@@ -1,0 +1,208 @@
+{
+  "n8nVersion": "2.41.7",
+  "nodeVersion": "v26.10.0",
+  "createdAt": "2026-10-05T13:50:42.529Z",
+  "cases": [
+    {
+      "name": "generate",
+      "scenario": "completed",
+      "workflowId": "c262dc0df9fcf7c7",
+      "cliExitCode": 0,
+      "workflowSuccess": true,
+      "httpAssertionsPassed": true,
+      "terminalAssertionsPassed": true,
+      "outputs": [
+        {
+          "id": "job-1"
+        },
+        {
+          "id": "job-2"
+        }
+      ],
+      "requestCount": 2,
+      "postCount": 2,
+      "pollCount": 0,
+      "renderNodeRuns": 0,
+      "lastNode": "Recorded job outputs"
+    },
+    {
+      "name": "object-completed",
+      "scenario": "completed",
+      "workflowId": "06a6df2db5c27131",
+      "cliExitCode": 1,
+      "workflowSuccess": false,
+      "httpAssertionsPassed": false,
+      "terminalAssertionsPassed": false,
+      "terminalError": "n8n execution reaches success",
+      "outputs": [],
+      "requestCount": 0,
+      "postCount": 0,
+      "pollCount": 0,
+      "renderNodeRuns": 1,
+      "lastNode": "renderShort",
+      "executionError": "The value in the \"JSON Body\" field is not valid JSON",
+      "errorDescription": "Unexpected token 'o', ...\"ptions\": [object Obj\"... is not valid JSON"
+    },
+    {
+      "name": "string-completed",
+      "scenario": "completed",
+      "workflowId": "df4d53bfb2748e53",
+      "cliExitCode": 0,
+      "workflowSuccess": true,
+      "httpAssertionsPassed": true,
+      "terminalAssertionsPassed": true,
+      "outputs": [
+        {
+          "shortId": 42,
+          "renderId": "render-42-1",
+          "status": "COMPLETED"
+        },
+        {
+          "shortId": 43,
+          "renderId": "render-43-1",
+          "status": "COMPLETED"
+        }
+      ],
+      "requestCount": 4,
+      "postCount": 2,
+      "pollCount": 2,
+      "renderNodeRuns": 2,
+      "lastNode": "verifyingLoopOutput"
+    },
+    {
+      "name": "string-pending",
+      "scenario": "pending-then-completed",
+      "workflowId": "df4d53bfb2748e53",
+      "cliExitCode": 0,
+      "workflowSuccess": true,
+      "httpAssertionsPassed": true,
+      "terminalAssertionsPassed": true,
+      "outputs": [
+        {
+          "shortId": 42,
+          "renderId": "render-42-1",
+          "status": "COMPLETED"
+        },
+        {
+          "shortId": 43,
+          "renderId": "render-43-1",
+          "status": "COMPLETED"
+        }
+      ],
+      "requestCount": 6,
+      "postCount": 2,
+      "pollCount": 4,
+      "renderNodeRuns": 2,
+      "lastNode": "verifyingLoopOutput"
+    },
+    {
+      "name": "string-failed",
+      "scenario": "failed-then-completed",
+      "workflowId": "df4d53bfb2748e53",
+      "cliExitCode": 1,
+      "workflowSuccess": false,
+      "httpAssertionsPassed": false,
+      "terminalAssertionsPassed": false,
+      "terminalError": "n8n execution reaches success",
+      "outputs": [],
+      "requestCount": 2,
+      "postCount": 1,
+      "pollCount": 1,
+      "renderNodeRuns": 2,
+      "lastNode": "renderShort",
+      "executionError": "The value in the \"JSON Body\" field is not valid JSON",
+      "errorDescription": "Unexpected token '}', ...\"ptions\": \n}\" is not valid JSON"
+    },
+    {
+      "name": "proposed-completed",
+      "scenario": "completed",
+      "workflowId": "dfe617d2cd25d2cc",
+      "cliExitCode": 0,
+      "workflowSuccess": true,
+      "httpAssertionsPassed": true,
+      "terminalAssertionsPassed": true,
+      "outputs": [
+        {
+          "shortId": 42,
+          "renderId": "render-42-1",
+          "status": "COMPLETED"
+        },
+        {
+          "shortId": 43,
+          "renderId": "render-43-1",
+          "status": "COMPLETED"
+        }
+      ],
+      "requestCount": 4,
+      "postCount": 2,
+      "pollCount": 2,
+      "renderNodeRuns": 2,
+      "lastNode": "verifyingLoopOutput"
+    },
+    {
+      "name": "proposed-pending",
+      "scenario": "pending-then-completed",
+      "workflowId": "dfe617d2cd25d2cc",
+      "cliExitCode": 0,
+      "workflowSuccess": true,
+      "httpAssertionsPassed": true,
+      "terminalAssertionsPassed": true,
+      "outputs": [
+        {
+          "shortId": 42,
+          "renderId": "render-42-1",
+          "status": "COMPLETED"
+        },
+        {
+          "shortId": 43,
+          "renderId": "render-43-1",
+          "status": "COMPLETED"
+        }
+      ],
+      "requestCount": 6,
+      "postCount": 2,
+      "pollCount": 4,
+      "renderNodeRuns": 2,
+      "lastNode": "verifyingLoopOutput"
+    },
+    {
+      "name": "proposed-failed",
+      "scenario": "failed-then-completed",
+      "workflowId": "dfe617d2cd25d2cc",
+      "cliExitCode": 0,
+      "workflowSuccess": true,
+      "httpAssertionsPassed": true,
+      "terminalAssertionsPassed": true,
+      "outputs": [
+        {
+          "shortId": 42,
+          "renderId": "render-42-2",
+          "status": "COMPLETED"
+        },
+        {
+          "shortId": 43,
+          "renderId": "render-43-2",
+          "status": "COMPLETED"
+        }
+      ],
+      "requestCount": 8,
+      "postCount": 4,
+      "pollCount": 4,
+      "renderNodeRuns": 4,
+      "lastNode": "verifyingLoopOutput"
+    }
+  ],
+  "expectedMatrixMatched": true,
+  "environment": {
+    "network": "Linux network namespace with loopback only",
+    "externalServices": "Local synthetic HTTP contracts",
+    "productionExecution": false
+  },
+  "sourceFixtureSha256": "685bc7c4d26035c3c94850c7cbee83098f1566ae122e2705c858a8c48b1c41ea",
+  "scriptSha256": {
+    "assert-results.mjs": "d7da5f3901aafb6d4e5e415f0773103fa50bc32044c9c92283115ea3674d25c1",
+    "build-fixtures.mjs": "7d591c7281a334a50506df8ea78cd54d0b73f9b50d4f5f53a4ccccea3f722bcc",
+    "mock-server.mjs": "3fb43675e5e7dca9ab4a8f6612aa609ec22a9cd48de11929131934fb26262788",
+    "run-local.mjs": "03d4e2fa71b827c0a1686b8e30e88a3f36f636794860875f5567be29c1f15c8b"
+  }
+}
