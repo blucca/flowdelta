@@ -2,7 +2,7 @@
 
 **Turn an n8n workflow change into a client-ready release handoff.**
 
-[Open FlowDelta](https://blucca.github.io/flowdelta/) · [See a sample release packet](examples/release-handoff.md) · [Discuss a $149 pilot](https://blucca.github.io/flowdelta/#pilot)
+[Open FlowDelta](https://blucca.github.io/flowdelta/) · [View a complete service sample](https://blucca.github.io/flowdelta/examples/service-sample.html) · [Discuss a $149 pilot](https://blucca.github.io/flowdelta/#pilot)
 
 Upload the workflow your client knows and the version you're delivering. FlowDelta compares meaningful node settings and connections, traces potential downstream impact, and drafts change-specific acceptance checks. Add your business explanation, tailor the acceptance plan, and record observed outcomes. Export Markdown or print a PDF for your client.
 
@@ -40,6 +40,8 @@ Workflow JSON is processed in your browser. There is no upload endpoint, trackin
 
 ## Release-handoff pilot — $149
 
+[View the three-page service sample](https://blucca.github.io/flowdelta/examples/service-sample.html) · [Download PDF](examples/service-sample.pdf). A historical Swiftia change brief, eight tailored acceptance cases and an evidence/sign-off record show the shape of the deliverable. All sample outcomes are **Not run**; the tailored service packet adds interpretation to the free comparator’s output.
+
 For consultants and small agencies with a release to hand over:
 
 - Up to three before/after workflow pairs, 150 total nodes across the submitted versions.
@@ -60,6 +62,18 @@ Zero runtime dependencies. Serve this directory with any static HTTP server:
 python -m http.server 8765 --bind 127.0.0.1
 node --test tests/*.test.mjs
 ```
+
+### Browser regression
+
+With Python Playwright, Chromium, Node.js and `pdftotext` available:
+
+```sh
+python tests/browser/editable-regression.py
+```
+
+This runs the core tests and all browser checks for editable acceptance plans, value-sharing exports, the Swiftia demo and contact layout. Each suite starts and closes its own local server on an available port; suites can also run individually from `tests/browser/`.
+
+Screenshots, Markdown/PDF downloads and `results.json` go to the workspace's `temp/flowdelta-browser/`. The workspace defaults to two directories above the product; set `FLOWDELTA_WORKSPACE` for another checkout layout. Set `FLOWDELTA_CHROMIUM` to override the browser executable. The helper uses the existing workspace browser when available, otherwise Playwright's installed Chromium; existing `LD_LIBRARY_PATH` and `FONTCONFIG_FILE` overrides are preserved.
 
 Independent product for n8n workflow exports. Not affiliated with n8n.
 

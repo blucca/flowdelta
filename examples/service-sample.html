@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A three-page FlowDelta release-handoff service sample: four historical workflow changes, eight tailored acceptance cases, and a client sign-off record.">
+  <title>Swiftia migration · Release-handoff service sample · FlowDelta</title>
+  <style>
+    :root { color-scheme: light; --ink: #173e35; --text: #253b33; --muted: #566b61; --line: #cedbd3; --paper: #fff; --wash: #f1f6f2; --amber: #775314; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #e6ece7; color: var(--text); font: 14px/1.45 Arial, Helvetica, sans-serif; overflow-wrap: anywhere; }
+    a { color: var(--ink); text-underline-offset: 3px; }
+    p, h1, h2, h3 { margin: 0; }
+    p + p { margin-top: 7px; }
+    code { font: .92em/1.4 ui-monospace, "SFMono-Regular", Consolas, monospace; overflow-wrap: anywhere; }
+    .toolbar { max-width: 210mm; margin: 20px auto 12px; display: flex; justify-content: space-between; gap: 14px; padding: 0 8px; font-size: 13px; }
+    .sheet { width: 210mm; min-height: 297mm; margin: 0 auto 22px; padding: 13mm; background: var(--paper); display: flex; flex-direction: column; box-shadow: 0 4px 22px #173e3510; }
+    .masthead { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid var(--ink); }
+    .brand { font-size: 19px; font-weight: 800; letter-spacing: -.6px; color: var(--ink); }
+    .doc-label { color: var(--muted); font-size: 10px; letter-spacing: 1.4px; text-transform: uppercase; text-align: right; }
+    .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); margin: 20px 0 8px; }
+    h1 { font: 39px/1.08 Georgia, "Times New Roman", serif; letter-spacing: -.7px; color: var(--ink); max-width: 620px; }
+    h2 { font: 29px/1.13 Georgia, "Times New Roman", serif; color: var(--ink); }
+    .intro { font-size: 15px; margin-top: 12px; }
+    .context { font-size: 11px; color: var(--muted); margin-top: 10px; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); margin: 20px 0 18px; padding: 13px 0; border-block: 1px solid var(--line); }
+    .metric { padding: 0 11px; border-left: 1px solid var(--line); }
+    .metric:first-child { padding-left: 0; border-left: 0; }
+    .metric strong { display: block; color: var(--ink); font-size: 28px; line-height: 1.1; }
+    .metric span { display: block; font-size: 10px; color: var(--muted); margin-top: 5px; }
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink); margin-bottom: 10px; }
+    .changes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .change { padding: 12px; background: var(--wash); border-top: 2px solid var(--line); font-size: 11.5px; }
+    .change h3 { font-size: 12px; margin-bottom: 6px; color: var(--ink); }
+    .change strong { font-weight: 700; }
+    .focus { margin-top: 16px; padding-left: 12px; border-left: 3px solid var(--ink); font-size: 12px; }
+    .focus h3 { font-size: 13px; margin-bottom: 5px; }
+    .offer { background: var(--ink); color: #fff; margin-top: 17px; padding: 13px 15px; display: grid; grid-template-columns: 80px 1fr; gap: 12px; align-items: center; font-size: 11px; }
+    .offer strong { font-size: 28px; line-height: 1; }
+    .offer small { display: block; font-size: 10px; margin-top: 5px; }
+    .provenance { font-size: 9.5px; color: var(--muted); margin-top: 13px; }
+    .provenance p + p { margin-top: 5px; }
+    .footer { margin-top: auto; padding-top: 14px; display: flex; justify-content: space-between; gap: 12px; font-size: 9px; color: var(--muted); }
+    .page-intro { font-size: 12px; margin: 10px 0 12px; }
+    .environment { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 9px 11px; background: var(--wash); color: var(--muted); font-size: 10px; margin-bottom: 13px; }
+    .cases { display: grid; gap: 12px; }
+    .case { border: 1px solid var(--line); padding: 11px 12px; break-inside: avoid; font-size: 11px; }
+    .case-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 7px; }
+    .case-heading h3 { font-size: 12px; line-height: 1.3; color: var(--ink); }
+    .case-id { color: var(--muted); display: inline-block; margin-right: 7px; font-size: 10px; letter-spacing: .5px; }
+    .status { flex: 0 0 auto; background: #faf1dc; color: var(--amber); border: 1px solid #e8d7af; padding: 2px 7px; border-radius: 3px; font-size: 10px; font-weight: 700; }
+    .case dl { margin: 0; display: grid; grid-template-columns: 53px 1fr; gap: 5px 7px; }
+    .case dt { font-size: 9px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .3px; padding-top: 1px; }
+    .case dd { margin: 0; min-width: 0; }
+    .record { border-top: 1px dotted var(--line); margin-top: 8px; padding-top: 6px; color: var(--muted); font-size: 9px; line-height: 1.65; }
+    .record span { display: block; }
+    .note { font-size: 10px; color: var(--muted); margin-top: 12px; }
+    .signoff { margin-top: 13px; background: var(--wash); padding: 11px 12px; font-size: 10px; }
+    .signoff h3 { font-size: 11px; color: var(--ink); margin-bottom: 7px; }
+    .signoff p + p { margin-top: 7px; }
+    @media (max-width: 800px) {
+      body { background: #fff; }
+      .toolbar { margin-top: 14px; padding-inline: 18px; }
+      .sheet { width: 100%; min-height: 0; padding: 22px 18px; margin-bottom: 0; box-shadow: none; border-bottom: 6px solid #e6ece7; }
+      .footer { margin-top: 18px; }
+    }
+    @media (max-width: 480px) {
+      h1 { font-size: 34px; }
+      h2 { font-size: 27px; }
+      .doc-label { font-size: 8px; letter-spacing: 1px; }
+      .changes { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: 1fr 1fr; gap: 14px 0; }
+      .metric:nth-child(3) { border-left: 0; padding-left: 0; }
+      .metric span { font-size: 11px; }
+      .change, .case { font-size: 12px; }
+      .case dl { grid-template-columns: 1fr; gap: 3px; }
+      .case dd + dt { margin-top: 5px; }
+      .environment { grid-template-columns: 1fr; }
+      .offer { grid-template-columns: 66px 1fr; }
+      .provenance, .record, .note, .signoff { font-size: 10.5px; }
+    }
+    @page { size: A4; margin: 12mm; }
+    @media print {
+      body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .toolbar { display: none; }
+      .sheet { width: auto; min-height: 272mm; margin: 0; padding: 0; box-shadow: none; border: 0; break-after: page; }
+      .sheet:last-child { break-after: auto; }
+      .footer { margin-top: auto; }
+      a { text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="toolbar" aria-label="Sample navigation"><a href="../">← FlowDelta</a><a href="service-sample.pdf">Download 3-page PDF</a></nav>
+  <main>
+    <section class="sheet" aria-labelledby="brief-title">
+      <header class="masthead"><a class="brand" href="https://blucca.github.io/flowdelta/">FlowDelta</a><span class="doc-label">Release handoff / Service sample</span></header>
+      <p class="eyebrow">01 / Client release brief</p>
+      <h1 id="brief-title">A small API migration.<br>A complete handoff.</h1>
+      <p class="intro">Swiftia video-to-shorts workflow · A review of the request, status and downstream delivery changes a consultant needs to explain before release.</p>
+      <p class="context">Independent analysis of historical public source; no client relationship. No n8n workflow or live service was executed for this specimen. Provider compatibility and retry limits remain to be established.</p>
+
+      <div class="metrics" aria-label="Static comparison summary">
+        <div class="metric"><strong>34</strong><span>nodes per version<br>including 6 notes</span></div>
+        <div class="metric"><strong>4</strong><span>changed nodes<br>6 parameter paths</span></div>
+        <div class="metric"><strong>0</strong><span>changed<br>connections</span></div>
+        <div class="metric"><strong>22</strong><span>potentially<br>affected nodes</span></div>
+      </div>
+      <h2 class="section-title">What changes for this release</h2>
+      <div class="changes">
+        <article class="change"><h3>01 · Generate shorts</h3><p><code>generateShorts</code> moves <code>youtubeVideoId</code> into <code>options</code>, removes <code>videoSource</code> and adds an empty <code>webhook</code>.</p><p><strong>Verify:</strong> the intended video reaches a provider-accepted request body.</p></article>
+        <article class="change"><h3>02 · Render each item</h3><p><code>renderShort</code> replaces <code>id</code>, <code>target</code> and a computed styling key with <code>shortId</code> and <code>renderOptions</code>.</p><p><strong>Verify:</strong> current-item ID and styling remain paired; serialized types are accepted.</p></article>
+        <article class="change"><h3>03 · Recognize completion</h3><p><code>iscompleted ?</code> changes <code>type = done</code> to the exact comparison <code>status = COMPLETED</code>.</p><p><strong>Verify:</strong> completion exits polling and reaches metadata generation.</p></article>
+        <article class="change"><h3>04 · Handle failure</h3><p><code>isError ?</code> changes <code>type = error</code> to <code>status = FAILED</code>. Its true branch returns to <code>renderShort</code>.</p><p><strong>Verify:</strong> repeated render requests follow an agreed stop policy.</p></article>
+      </div>
+      <div class="focus"><h3>The release decision goes beyond the four edits.</h3><p>Unchanged connections still carry new behavior: <code>FAILED</code> triggers another render POST; a nonmatching completion response loops through <code>Wait1</code>. Before sign-off, establish the provider contract, item pairing and bounded rerender/polling policy, then verify the final upload. The 22-node set is static reachability, not observed runtime impact.</p></div>
+      <aside class="offer" aria-label="Pilot service scope"><div><strong>$149</strong><small>fixed-scope pilot</small></div><p>Your release gets an annotated change brief, tailored acceptance cases and a handoff document, with one revision. Up to 3 workflow pairs / 150 nodes across both versions. You execute the checks; implementation is separately scoped. Agree scope and date before payment.</p></aside>
+      <div class="provenance"><p><strong>Source:</strong> MI, © 2025 · <a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow">n8n-youtube-to-shorts-workflow</a> · MIT-licensed workflow. <a href="https://blucca.github.io/flowdelta/examples/public-cases/swiftia-LICENSE.txt">Full license</a>.</p><p><a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/blob/5b4f23c641b4392763e1ca100f27d71252df6228/video_to_shorts_Automation.json">Before: 5b4f23c</a> → <a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/blob/7cd32c2a6ccbb2ca6edf4bded2534e916fd08985/video_to_shorts_Automation.json">After: 7cd32c2</a> · <a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/commit/7cd32c2a6ccbb2ca6edf4bded2534e916fd08985">Migration commit</a> · <a href="https://github.com/blucca/flowdelta/blob/main/examples/public-cases/CASE-STUDY.md">Full analysis</a>. Fixtures omit pinned data and export-instance metadata; credential/webhook identifiers are replaced consistently. Original node IDs, parameters and graph are retained.</p></div>
+      <footer class="footer"><span>FLOWDELTA · Historical engineering specimen · 5 Oct 2026</span><span>01 / 03</span></footer>
+    </section>
+
+    <section class="sheet" aria-labelledby="requests-title">
+      <header class="masthead"><span class="brand">FlowDelta</span><span class="doc-label">Swiftia migration / Acceptance record</span></header>
+      <p class="eyebrow">02 / Requests &amp; completion</p>
+      <h2 id="requests-title">Prove the contract at the boundary.</h2>
+      <p class="page-intro">Use controlled response fixtures in the target n8n environment. Capture evaluated values and branch outputs; attach evidence by case ID. Confirm the intended provider contract before accepting a payload.</p>
+      <div class="environment"><span>Client / release owner: ______________________</span><span>Environment / n8n version: __________________</span></div>
+      <div class="cases">
+        <article class="case" id="api-1"><div class="case-heading"><h3><span class="case-id">API-1</span>Video request shape</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd><code>preparingField.videoId = "fixture-video"</code>; <code>videoSource = "youtube"</code>.</dd><dt>Check</dt><dd>Evaluate the <code>generateShorts</code> JSON body. Require <code>options.youtubeVideoId</code> to contain the source ID, retain <code>functionName: "VideoShorts"</code> and the intended empty <code>webhook</code>. Confirm the provider accepts removal of <code>videoSource</code>.</dd><dt>Evidence</dt><dd>Evaluated request JSON, source-item reference and agreed provider schema / response evidence.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+        <article class="case" id="api-2"><div class="case-heading"><h3><span class="case-id">API-2</span>Two-item ID and styling pairing</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Two current-item fixtures with <code>['data.shorts'].id</code> values <code>42</code> and <code>43</code>, each with a distinct styling object.</dd><dt>Check</dt><dd>Capture one <code>renderShort</code> body per item. Each <code>shortId</code> must come from the corresponding <code>current_item_ref['data.shorts'].id</code>; <code>renderOptions</code> must preserve the intended type and fields. Reject cross-paired IDs or styling.</dd><dt>Evidence</dt><dd>Both evaluated bodies beside their originating item and styling fixtures.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+        <article class="case" id="api-3"><div class="case-heading"><h3><span class="case-id">API-3</span>Serialization edge cases</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Styling as an object, preset string, missing value and malformed upstream text; include an ID with a string value.</dd><dt>Check</dt><dd>The new template interpolates styling directly; the old one used <code>.toJsonString()</code>. Evaluate each combination. Record JSON validity and provider-required types; specify which inputs are supported and how unsupported inputs stop.</dd><dt>Evidence</dt><dd>Input/output matrix with parsed JSON or exact error, plus the type decision for each case.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+        <article class="case" id="status-1"><div class="case-heading"><h3><span class="case-id">STATUS-1</span>Completed work exits the loop</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Controlled status response: <code>{"status":"COMPLETED"}</code>.</dd><dt>Check</dt><dd><code>isError ?</code> takes false, then <code>iscompleted ?</code> takes true. Continue to metadata generation without another render/poll cycle for that item.</dd><dt>Evidence</dt><dd>Branch trace, metadata input and per-item render/status request counts.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+      </div>
+      <p class="note">Keep credentials out of the evidence packet. Record a redacted evaluated body and an execution reference rather than a credential-bearing request.</p>
+      <footer class="footer"><span>FLOWDELTA · Acceptance cases 1–4 of 8 · Evidence pending</span><span>02 / 03</span></footer>
+    </section>
+
+    <section class="sheet" aria-labelledby="outcomes-title">
+      <header class="masthead"><span class="brand">FlowDelta</span><span class="doc-label">Swiftia migration / Acceptance record</span></header>
+      <p class="eyebrow">03 / Failure, polling &amp; delivery</p>
+      <h2 id="outcomes-title">Make the stopping rules explicit.</h2>
+      <p class="page-intro">Establish the retry budget and timeout with the release owner. The exported graph shows cycles; it does not establish a safe runtime limit.</p>
+      <div class="cases">
+        <article class="case" id="status-2"><div class="case-heading"><h3><span class="case-id">STATUS-2</span>Repeated failure has a stopping rule</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Repeated controlled responses: <code>{"status":"FAILED"}</code>.</dd><dt>Check</dt><dd><code>isError ?</code> takes true back to <code>renderShort</code>. Record POST count and item identity. Accept repeat requests only within the agreed retry/stop policy; demonstrate the terminal outcome.</dd><dt>Evidence</dt><dd>Per-item POST trace, configured retry/timeout controls and final stop / error record.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+        <article class="case" id="status-3"><div class="case-heading"><h3><span class="case-id">STATUS-3</span>Polling progresses to completion</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd><code>{"status":"PENDING"}</code>, then <code>{"status":"COMPLETED"}</code>. <code>PENDING</code> is a synthetic nonmatching value, not an asserted provider state.</dd><dt>Check</dt><dd>The first response takes the poll/wait path; the second exits it. Record elapsed wait and status-request count against the intended polling policy.</dd><dt>Evidence</dt><dd>Ordered response / branch trace, wait timing and request count for the same item.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+        <article class="case" id="status-4"><div class="case-heading"><h3><span class="case-id">STATUS-4</span>Malformed and legacy responses terminate</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd><code>{}</code>, <code>{"status":null}</code>, <code>{"status":"completed"}</code>, <code>{"type":"done"}</code>, <code>{"type":"error"}</code>.</dd><dt>Check</dt><dd>Record validation errors or nonmatching routes. Establish and verify the timeout/error outcome so these responses cannot lead to indefinite polling or unintended rerenders.</dd><dt>Evidence</dt><dd>One result per fixture: route or error, request count, elapsed time and terminal outcome.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+        <article class="case" id="output-1"><div class="case-heading"><h3><span class="case-id">OUTPUT-1</span>The intended shorts reach delivery</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Two rendered-short fixtures with distinct IDs and controlled upload responses.</dd><dt>Check</dt><dd>Confirm output count, metadata-to-file pairing, scheduled publication data and one intended upload per short.</dd><dt>Evidence</dt><dd>Reconciliation of source short → rendered file → metadata/schedule → controlled upload result.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
+      </div>
+      <section class="signoff" aria-label="Release decision record"><h3>Release decision · Pending execution evidence</h3><p>Retry / timeout policy: ________________________________________________________</p><p>Decision (proceed / hold / revise): ______________ &nbsp; Open issues: __________________</p><p>Release owner: __________________ &nbsp; Reviewer: __________________ &nbsp; Date: __________</p></section>
+      <footer class="footer"><span>FLOWDELTA · Acceptance cases 5–8 of 8 · belgialucca@gmail.com</span><span>03 / 03</span></footer>
+    </section>
+  </main>
+</body>
+</html>
