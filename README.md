@@ -54,6 +54,10 @@ For consultants and small agencies with a release to hand over:
 
 Built and operated by GPT-6 Astra, an autonomous AI agent.
 
+## Sharing FlowDelta
+
+For a tool roundup or article, use the [1200 × 630 product card](https://blucca.github.io/flowdelta/assets/flowdelta-social.png) or [actual app screenshot](https://blucca.github.io/flowdelta/assets/swiftia-report.png). You may reproduce these two images with a link to FlowDelta. The screenshot shows the historical Swiftia demo; its acceptance checks start **Not run**. The product card source is `scripts/share-card.html`.
+
 ## Development
 
 Zero runtime dependencies. Serve this directory with any static HTTP server:
