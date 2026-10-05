@@ -42,7 +42,7 @@ Workflow JSON is processed in your browser. There is no upload endpoint, trackin
 
 ## Release-handoff pilot — $149
 
-[View the three-page service sample](https://blucca.github.io/flowdelta/examples/service-sample.html) · [Download PDF](examples/service-sample.pdf). A historical Swiftia change brief, eight tailored acceptance cases and an evidence/sign-off record show the shape of the deliverable. All sample outcomes are **Not run**; the tailored service packet adds interpretation to the free comparator’s output.
+[View the four-page service sample](https://blucca.github.io/flowdelta/examples/service-sample.html) · [Download PDF](examples/service-sample.pdf). Pages 1–3 show a historical Swiftia change brief, eight tailored acceptance cases and a sign-off record. Those eight full-workflow outcomes remain **Not run**. Page 4 demonstrates a **separately scoped executed-checks deliverable**: two reproduced failures, a tested payload revision and remaining release steps. The $149 pilot covers the documented review and acceptance design; you execute the checks. Implementation and execution work are separately scoped and quoted.
 
 For consultants and small agencies with a release to hand over:
 

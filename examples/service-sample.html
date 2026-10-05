@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A three-page FlowDelta release-handoff service sample: four historical workflow changes, eight tailored acceptance cases, and a client sign-off record.">
+  <meta name="description" content="A four-page FlowDelta sample: a release brief, eight acceptance cases, a sign-off record, and a separately scoped executed-checks example with two reproduced failures and a tested payload revision.">
   <title>Swiftia migration · Release-handoff service sample · FlowDelta</title>
   <style>
     :root { color-scheme: light; --ink: #173e35; --text: #253b33; --muted: #566b61; --line: #cedbd3; --paper: #fff; --wash: #f1f6f2; --amber: #775314; }
@@ -58,6 +58,25 @@
     .signoff { margin-top: 13px; background: var(--wash); padding: 11px 12px; font-size: 10px; }
     .signoff h3 { font-size: 11px; color: var(--ink); margin-bottom: 7px; }
     .signoff p + p { margin-top: 7px; }
+    .lab-context { margin: 11px 0 13px; padding: 10px 12px; background: var(--wash); font-size: 10px; }
+    .lab-context p + p { margin-top: 5px; }
+    .evidence-table { width: 100%; border-collapse: collapse; font-size: 10.5px; line-height: 1.4; }
+    .evidence-table caption { text-align: left; font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .evidence-table th, .evidence-table td { text-align: left; vertical-align: top; padding: 8px 9px; border-bottom: 1px solid var(--line); }
+    .evidence-table thead { background: var(--wash); font-size: 9px; text-transform: uppercase; letter-spacing: .4px; }
+    .evidence-table th:nth-child(2), .evidence-table td:nth-child(2) { width: 76px; text-align: center; white-space: nowrap; }
+    .evidence-table td:first-child { width: 37%; }
+    .evidence-table td strong { display: block; }
+    .lab-fail { color: #8b3e29; }
+    .lab-pass { color: var(--ink); }
+    .revision { margin-top: 15px; }
+    .revision h3, .release-gates h3 { font-size: 12px; color: var(--ink); margin-bottom: 6px; }
+    .revision p { font-size: 10.5px; }
+    .revision pre { margin: 8px 0 0; padding: 10px 12px; background: var(--wash); border-left: 3px solid var(--ink); font-size: 10px; line-height: 1.4; white-space: pre-wrap; }
+    .release-gates { margin-top: 14px; font-size: 10.5px; }
+    .release-gates ol { margin: 0; padding-left: 19px; }
+    .release-gates li + li { margin-top: 5px; }
+    .lab-scope { margin-top: 13px; padding: 10px 12px; border: 1px solid var(--line); font-size: 10px; }
     @media (max-width: 800px) {
       body { background: #fff; }
       .toolbar { margin-top: 14px; padding-inline: 18px; }
@@ -91,14 +110,14 @@
   </style>
 </head>
 <body>
-  <nav class="toolbar" aria-label="Sample navigation"><a href="../">← FlowDelta</a><a href="service-sample.pdf">Download 3-page PDF</a></nav>
+  <nav class="toolbar" aria-label="Sample navigation"><a href="../">← FlowDelta</a><a href="service-sample.pdf">Download 4-page PDF</a></nav>
   <main>
     <section class="sheet" aria-labelledby="brief-title">
       <header class="masthead"><a class="brand" href="https://blucca.github.io/flowdelta/">FlowDelta</a><span class="doc-label">Release handoff / Service sample</span></header>
       <p class="eyebrow">01 / Client release brief</p>
       <h1 id="brief-title">A small API migration.<br>A complete handoff.</h1>
       <p class="intro">Swiftia video-to-shorts workflow · A review of the request, status and downstream delivery changes a consultant needs to explain before release.</p>
-      <p class="context">Independent analysis of historical public source; no client relationship. No n8n workflow or live service was executed for this specimen. Provider compatibility and retry limits remain to be established.</p>
+      <p class="context">Self-initiated analysis of historical public source. Pages 1–3 show the documented review and eight full-workflow acceptance cases, all awaiting execution in the target environment. Page 4 adds an isolated n8n execution example under a separate service scope.</p>
 
       <div class="metrics" aria-label="Static comparison summary">
         <div class="metric"><strong>34</strong><span>nodes per version<br>including 6 notes</span></div>
@@ -116,7 +135,7 @@
       <div class="focus"><h3>The release decision goes beyond the four edits.</h3><p>Unchanged connections still carry new behavior: <code>FAILED</code> triggers another render POST; a nonmatching completion response loops through <code>Wait1</code>. Before sign-off, establish the provider contract, item pairing and bounded rerender/polling policy, then verify the final upload. The 22-node set is static reachability, not observed runtime impact.</p></div>
       <aside class="offer" aria-label="Pilot service scope"><div><strong>$149</strong><small>fixed-scope pilot</small></div><p>Your release gets an annotated change brief, tailored acceptance cases and a handoff document, with one revision. Up to 3 workflow pairs / 150 nodes across both versions. You execute the checks; implementation is separately scoped. Agree scope and date before payment.</p></aside>
       <div class="provenance"><p><strong>Source:</strong> MI, © 2025 · <a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow">n8n-youtube-to-shorts-workflow</a> · MIT-licensed workflow. <a href="https://blucca.github.io/flowdelta/examples/public-cases/swiftia-LICENSE.txt">Full license</a>.</p><p><a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/blob/5b4f23c641b4392763e1ca100f27d71252df6228/video_to_shorts_Automation.json">Before: 5b4f23c</a> → <a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/blob/7cd32c2a6ccbb2ca6edf4bded2534e916fd08985/video_to_shorts_Automation.json">After: 7cd32c2</a> · <a href="https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/commit/7cd32c2a6ccbb2ca6edf4bded2534e916fd08985">Migration commit</a> · <a href="https://github.com/blucca/flowdelta/blob/main/examples/public-cases/CASE-STUDY.md">Full analysis</a>. Fixtures omit pinned data and export-instance metadata; credential/webhook identifiers are replaced consistently. Original node IDs, parameters and graph are retained.</p></div>
-      <footer class="footer"><span>FLOWDELTA · Historical engineering specimen · 5 Oct 2026</span><span>01 / 03</span></footer>
+      <footer class="footer"><span>FLOWDELTA · Historical engineering specimen · 5 Oct 2026</span><span>01 / 04</span></footer>
     </section>
 
     <section class="sheet" aria-labelledby="requests-title">
@@ -132,7 +151,7 @@
         <article class="case" id="status-1"><div class="case-heading"><h3><span class="case-id">STATUS-1</span>Completed work exits the loop</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Controlled status response: <code>{"status":"COMPLETED"}</code>.</dd><dt>Check</dt><dd><code>isError ?</code> takes false, then <code>iscompleted ?</code> takes true. Continue to metadata generation without another render/poll cycle for that item.</dd><dt>Evidence</dt><dd>Branch trace, metadata input and per-item render/status request counts.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
       </div>
       <p class="note">Keep credentials out of the evidence packet. Record a redacted evaluated body and an execution reference rather than a credential-bearing request.</p>
-      <footer class="footer"><span>FLOWDELTA · Acceptance cases 1–4 of 8 · Evidence pending</span><span>02 / 03</span></footer>
+      <footer class="footer"><span>FLOWDELTA · Acceptance cases 1–4 of 8 · Evidence pending</span><span>02 / 04</span></footer>
     </section>
 
     <section class="sheet" aria-labelledby="outcomes-title">
@@ -147,7 +166,48 @@
         <article class="case" id="output-1"><div class="case-heading"><h3><span class="case-id">OUTPUT-1</span>The intended shorts reach delivery</h3><span class="status">Not run</span></div><dl><dt>Input</dt><dd>Two rendered-short fixtures with distinct IDs and controlled upload responses.</dd><dt>Check</dt><dd>Confirm output count, metadata-to-file pairing, scheduled publication data and one intended upload per short.</dd><dt>Evidence</dt><dd>Reconciliation of source short → rendered file → metadata/schedule → controlled upload result.</dd></dl><div class="record"><span>Owner: ________________ &nbsp; Evidence / run ID: ________________________</span><span>Observation / outcome: ___________________________________________________</span></div></article>
       </div>
       <section class="signoff" aria-label="Release decision record"><h3>Release decision · Pending execution evidence</h3><p>Retry / timeout policy: ________________________________________________________</p><p>Decision (proceed / hold / revise): ______________ &nbsp; Open issues: __________________</p><p>Release owner: __________________ &nbsp; Reviewer: __________________ &nbsp; Date: __________</p></section>
-      <footer class="footer"><span>FLOWDELTA · Acceptance cases 5–8 of 8 · belgialucca@gmail.com</span><span>03 / 03</span></footer>
+      <footer class="footer"><span>FLOWDELTA · Acceptance cases 5–8 of 8 · belgialucca@gmail.com</span><span>03 / 04</span></footer>
+    </section>
+
+    <section class="sheet execution-sheet" aria-labelledby="execution-title">
+      <header class="masthead"><span class="brand">FlowDelta</span><span class="doc-label">Swiftia migration / Execution addendum</span></header>
+      <p class="eyebrow">04 / Separately scoped executed-checks example</p>
+      <h2 id="execution-title">Two failures. One targeted revision.</h2>
+      <p class="page-intro"><strong>Recommended next step:</strong> revise the render payload, then complete target-environment acceptance before rollout. The original expression failed on object-valued styling and on the retry path.</p>
+      <div class="lab-context">
+        <p><strong>Executed 5 Oct 2026 · n8n 2.41.7 / Node.js 26.10.0.</strong> A loopback-only Linux network namespace hosted n8n and a local HTTP mock. Render fixtures use two shorts, numeric IDs <code>42</code> and <code>43</code>, with distinct styling.</p>
+        <p><strong>Tested slice:</strong> original render-loop nodes, expressions and wiring, with synthetic input and service responses, shortened waits, and a terminal recorder replacing metadata and upload. Results below cover that isolated slice; the eight full-workflow cases on pages 2–3 remain <strong>Not run</strong>.</p>
+      </div>
+      <table class="evidence-table">
+        <caption>Observed requests and outcomes · request totals per scenario</caption>
+        <thead><tr><th scope="col">Payload / response fixture</th><th scope="col">POST / GET</th><th scope="col">Observed result</th></tr></thead>
+        <tbody>
+          <tr data-case="object-completed"><td><strong>Original · object styling</strong>Immediate completion</td><td>0 / 0</td><td><strong class="lab-fail">Fail · first request blocked</strong><code>[object Object]</code> makes the JSON body invalid.</td></tr>
+          <tr data-case="string-failed"><td><strong>Original · JSON-encoded styling</strong>Failed → replacement</td><td>1 / 1</td><td><strong class="lab-fail">Fail · retry body invalid</strong>The status-response input supplies no <code>styling</code>; execution stops at the second render attempt.</td></tr>
+          <tr data-case="proposed-completed"><td><strong>Revised · object styling</strong>Immediate completion</td><td>2 / 2</td><td><strong class="lab-pass">Pass · 2 terminal outputs</strong>IDs and styling stay paired.</td></tr>
+          <tr data-case="proposed-pending"><td><strong>Revised · object styling</strong>Pending → completion</td><td>2 / 4</td><td><strong class="lab-pass">Pass · 2 terminal outputs</strong>Each short completes after polling.</td></tr>
+          <tr data-case="proposed-failed"><td><strong>Revised · object styling</strong>Failed → replacement → completion</td><td>4 / 4</td><td><strong class="lab-pass">Pass · 2 terminal outputs</strong>Two render attempts per short; IDs and styling stay paired.</td></tr>
+        </tbody>
+      </table>
+      <section class="revision" aria-label="Proposed payload revision">
+        <h3>Adopt this field revision for the next test run</h3>
+        <p>Set <code>renderShort.parameters.jsonBody</code> to an object expression. Read both fields from the paired source item on initial and retry executions:</p>
+        <pre><code>={{ {
+  shortId: $('current_item_ref').item.json['data.shorts'].id,
+  renderOptions: $('current_item_ref').item.json.styling
+} }}</code></pre>
+      </section>
+      <section class="release-gates" aria-label="Remaining release acceptance">
+        <h3>Before rollout · complete these three acceptance steps</h3>
+        <ol>
+          <li><strong>Agree the provider contract:</strong> validate the generate/render payloads and supported ID/styling types against the target API.</li>
+          <li><strong>Bound recovery:</strong> agree rerender limits and polling timeouts, then test repeated failure and malformed responses through their terminal outcomes.</li>
+          <li><strong>Verify delivery:</strong> run the complete workflow and reconcile both short IDs through metadata, scheduling and the intended uploads.</li>
+        </ol>
+      </section>
+      <aside class="lab-scope" aria-label="Executed-checks service scope"><strong>Two clearly scoped deliverables.</strong> The <strong>$149 pilot</strong> covers the documented review, acceptance design and handoff, with one revision; <strong>you execute the checks</strong>. This executed-checks example demonstrates an additional implementation/testing deliverable. Its scope, price and delivery date are agreed separately for your workflow.</aside>
+      <p class="provenance"><a href="https://blucca.github.io/flowdelta/examples/runtime-checks/observed-results.json">Full eight-scenario result record</a> · <a href="https://github.com/blucca/flowdelta/blob/main/examples/runtime-checks/README.md">Reproduce the checks and inspect adaptations</a> · Historical workflow: MI, MIT (source and license on page 1).</p>
+      <footer class="footer"><span>FLOWDELTA · Isolated execution evidence · 5 Oct 2026</span><span>04 / 04</span></footer>
     </section>
   </main>
 </body>

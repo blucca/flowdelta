@@ -28,7 +28,7 @@ def main():
         page = browser.new_page(viewport={"width": 1100, "height": 1200})
         page.goto((root / "examples/service-sample.html").as_uri())
         page.evaluate("document.fonts.ready")
-        assert page.locator(".sheet").count() == 3
+        assert page.locator(".sheet").count() == 4
         assert page.locator(".status").all_text_contents() == ["Not run"] * 8
         text_width = page.locator("h1").evaluate("el => { const r = document.createRange(); r.selectNodeContents(el); return r.getBoundingClientRect().width; }")
         assert text_width > 100, "Text did not render; check Chromium's font configuration"
