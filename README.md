@@ -12,7 +12,7 @@ Open the app and choose **Try a lead-routing demo**. A qualification threshold m
 
 **Real-world example:** [Explore a historical Swiftia API migration](https://blucca.github.io/flowdelta/?demo=swiftia): four changed nodes in a 34-node workflow, 22 potentially affected nodes, and request/polling acceptance checks. [Read the annotated acceptance plan and source attribution](examples/public-cases/CASE-STUDY.md).
 
-You can also download [before](examples/before.json) and [after](examples/after.json) JSON.
+Read the [visual walkthrough and boundary-value acceptance table](examples/CASE-STUDY.md), or download [before](examples/before.json) and [after](examples/after.json) JSON.
 
 ## What it compares
 

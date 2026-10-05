@@ -10,6 +10,14 @@ A synthetic release example for an automation consultant handing a lead-routing 
 
 The exported change is small: one IF parameter, one Slack node and one connection. Repositioning the canvas adds no business change.
 
+## The visual overview
+
+![New-version lead routing: the qualification decision branches to CRM then Slack, or to the unchanged nurture marker.](lead-routing-overview.png)
+
+Rendered from our [new-version JSON](after.json) with [Pixtex](https://pixtex.dev/), using its DOCS preset and 2× PNG export on 5 October 2026. The image is a structural overview; the acceptance table below specifies the behavior to verify. These sample workflows have placeholder services and have not been executed in n8n.
+
+The diagram and the release packet use the same exported version: preserve both when handing a release to a client, so the visual explanation, checks and observed results refer to the same artifact.
+
 ## What the client needs to know
 
 Leads scoring 60–74 switch from the CRM path to the nurture branch. Scores of 75 and above retain the CRM path and gain a downstream notification. The nurture node itself was not edited, but its input population changes; it belongs in the acceptance plan.
