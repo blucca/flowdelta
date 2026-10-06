@@ -33,7 +33,7 @@ The second step has `continue-on-error: true` because this demonstration **expec
 ## One expression changes
 
 ```diff
-- ={ "shortId": {{ $json['data.shorts'].id }}, "renderOptions": {{ $json.styling }} }
+- ={ "shortId": {{ $('current_item_ref').item.json['data.shorts'].id }}, "renderOptions": {{ $json.styling }} }
 + ={{ { shortId: $('current_item_ref').item.json['data.shorts'].id, renderOptions: $('current_item_ref').item.json.styling } }}
 ```
 
