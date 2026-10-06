@@ -1,0 +1,170 @@
+{
+  "version": 1,
+  "name": "One failed render, one pending render: preserve both short identities",
+  "input": {
+    "node": "Fixture shorts",
+    "items": [
+      {
+        "data.shorts": {
+          "id": 42,
+          "text": "Synthetic short A",
+          "reason": "fixture"
+        },
+        "styling": {
+          "color": "#112233",
+          "fontSize": 31
+        },
+        "title": "Fixture A"
+      },
+      {
+        "data.shorts": {
+          "id": 43,
+          "text": "Synthetic short B",
+          "reason": "fixture"
+        },
+        "styling": {
+          "color": "#aabbcc",
+          "fontSize": 47
+        },
+        "title": "Fixture B"
+      }
+    ]
+  },
+  "mocks": [
+    {
+      "node": "renderShort",
+      "url": "/api/render/",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/api/render/",
+          "responses": [
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-42-1"
+              }
+            },
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-42-2"
+              }
+            },
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-43-1"
+              }
+            }
+          ],
+          "expect": {
+            "count": 3,
+            "bodies": [
+              {
+                "shortId": 42,
+                "renderOptions": {
+                  "color": "#112233",
+                  "fontSize": 31
+                }
+              },
+              {
+                "shortId": 42,
+                "renderOptions": {
+                  "color": "#112233",
+                  "fontSize": 31
+                }
+              },
+              {
+                "shortId": 43,
+                "renderOptions": {
+                  "color": "#aabbcc",
+                  "fontSize": 47
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "node": "getRender",
+      "url": "/api/render/{{ $json.renderId }}",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/api/render/render-42-1",
+          "responses": [
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-42-1",
+                "status": "FAILED"
+              }
+            }
+          ],
+          "expect": {
+            "count": 1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/render/render-42-2",
+          "responses": [
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-42-2",
+                "status": "COMPLETED"
+              }
+            }
+          ],
+          "expect": {
+            "count": 1
+          }
+        },
+        {
+          "method": "GET",
+          "path": "/api/render/render-43-1",
+          "responses": [
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-43-1",
+                "status": "PENDING"
+              }
+            },
+            {
+              "status": 200,
+              "json": {
+                "renderId": "render-43-1",
+                "status": "COMPLETED"
+              }
+            }
+          ],
+          "expect": {
+            "count": 2
+          }
+        }
+      ]
+    }
+  ],
+  "assertions": [
+    {
+      "node": "Record completed short",
+      "equals": [
+        {
+          "shortId": 42,
+          "renderId": "render-42-2",
+          "status": "COMPLETED"
+        },
+        {
+          "shortId": 43,
+          "renderId": "render-43-1",
+          "status": "COMPLETED"
+        }
+      ]
+    }
+  ],
+  "maxRequests": 20
+}
