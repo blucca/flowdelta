@@ -4,7 +4,7 @@
 
 This is a consumer of the [n8n-check GitHub Action](https://github.com/blucca/n8n-check#add-a-check-to-github-actions). The workflow export and fixture contract live in this repository; GitHub builds the pinned n8n runtime and executes the real nodes. JSON/JUnit reports and readable check summaries accompany each run.
 
-[View the workflow runs](https://github.com/blucca/flowdelta/actions/workflows/n8n-regression.yml) · [Copy the CI file](../../.github/workflows/n8n-regression.yml) · [Read the fixture contract](render.case.json)
+[Read the recorded check summaries](observed-run.md) · [View the workflow runs](https://github.com/blucca/flowdelta/actions/workflows/n8n-regression.yml) · [Copy the CI file](../../.github/workflows/n8n-regression.yml) · [Read the fixture contract](render.case.json)
 
 ## Try it entirely in GitHub
 
@@ -41,7 +41,7 @@ See the JSON files for the original expression's exact whitespace. The full-obje
 
 ## Origin and execution boundary
 
-These workflow slices are generated from the MIT-licensed [public Swiftia example](../public-cases/README.md) by [build-fixtures.mjs](../runtime-checks/build-fixtures.mjs): `--styling object` for the original and `--repair-body` for the proposed expression. Both files then receive the same fixture name and ID. Copyright (c) 2025 MI; the [upstream MIT notice](../public-cases/swiftia-LICENSE.txt) applies to derived workflow portions. The new case, consumer CI, and documentation are MIT under [Blucca's runtime-example license](../runtime-checks/LICENSE).
+These workflow slices are generated from the MIT-licensed [public Swiftia example](../public-cases/README.md) by [build-fixtures.mjs](../runtime-checks/build-fixtures.mjs): `--styling object` for the original and `--repair-body` for the proposed expression. Both files then receive the same fixture name and ID. Copyright (c) 2025 MI; the [upstream MIT notice](../public-cases/swiftia-LICENSE.txt) applies to derived workflow portions. The new case, consumer CI, and documentation are MIT under [Blucca's example license](LICENSE).
 
 The fixture starts before the item loop. Wait is shortened to 0.1 seconds; a Set node records terminal outputs; external branches are omitted. The case redirects two HTTP Request nodes to the local mock. The action mounts the two input JSON files read-only, creates an isolated n8n database under the output directory, and runs with loopback-only networking. The test scope covers this JSON/HTTP render slice. Source forms, production credentials, Swiftia, uploads, Gemini and live provider contracts have their own acceptance checks.
 

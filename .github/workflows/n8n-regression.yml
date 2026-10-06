@@ -2,11 +2,13 @@ name: n8n render-loop regression example
 on:
   push:
     paths:
-      - examples/ci-checks/**
+      - examples/ci-checks/render-*.json
+      - examples/ci-checks/render.case.json
       - .github/workflows/n8n-regression.yml
   pull_request:
     paths:
-      - examples/ci-checks/**
+      - examples/ci-checks/render-*.json
+      - examples/ci-checks/render.case.json
       - .github/workflows/n8n-regression.yml
   workflow_dispatch:
 permissions:

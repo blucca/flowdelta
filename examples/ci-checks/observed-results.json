@@ -1,0 +1,410 @@
+{
+  "source": "GitHub Actions artifact render-loop-json-and-junit",
+  "run": "https://github.com/blucca/flowdelta/actions/runs/37447564414",
+  "consumerCommit": "0c8717d53792896394fe16d8737da80bcf932022",
+  "actionCommit": "1a9439e7b0d448fa22d530bca4cc8497f1838369",
+  "inputSha256": {
+    "render-fixed.json": "e47f2e436923b09eb236d83cf3dca24566d3c7366d190fc4fb7ec1dd8d0ef5e4",
+    "render-broken.json": "19512301d6efa408e572aa1af17a2e86612bfde4cc461da1030264a961df8da9",
+    "render.case.json": "591ee7c86087eacb7c7b6b1dcfedffcb892b6c0510c77c751e0d48bb26315015"
+  },
+  "reports": {
+    "fixed": {
+      "schemaVersion": 1,
+      "runnerVersion": "0.1.2",
+      "name": "One failed render, one pending render: preserve both short identities",
+      "startedAt": "2026-10-06T10:07:37.151Z",
+      "nodeVersion": "v26.7.0",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "n8n execution succeeds",
+          "passed": true,
+          "actual": {
+            "cliExitCode": 0,
+            "lastNode": "verifyingLoopOutput",
+            "executionFound": true
+          }
+        },
+        {
+          "name": "Record completed short: output 0",
+          "passed": true,
+          "expected": [
+            {
+              "shortId": 42,
+              "renderId": "render-42-2",
+              "status": "COMPLETED"
+            },
+            {
+              "shortId": 43,
+              "renderId": "render-43-1",
+              "status": "COMPLETED"
+            }
+          ],
+          "actual": [
+            {
+              "shortId": 42,
+              "renderId": "render-42-2",
+              "status": "COMPLETED"
+            },
+            {
+              "shortId": 43,
+              "renderId": "render-43-1",
+              "status": "COMPLETED"
+            }
+          ]
+        },
+        {
+          "name": "mock: all requests match routes",
+          "passed": true,
+          "actual": []
+        },
+        {
+          "name": "mock: request limits and server",
+          "passed": true,
+          "actual": []
+        },
+        {
+          "name": "renderShort: POST /api/render/ request count",
+          "passed": true,
+          "expected": 3,
+          "actual": 3
+        },
+        {
+          "name": "renderShort: POST /api/render/ request bodies",
+          "passed": true,
+          "expected": [
+            {
+              "shortId": 42,
+              "renderOptions": {
+                "color": "#112233",
+                "fontSize": 31
+              }
+            },
+            {
+              "shortId": 42,
+              "renderOptions": {
+                "color": "#112233",
+                "fontSize": 31
+              }
+            },
+            {
+              "shortId": 43,
+              "renderOptions": {
+                "color": "#aabbcc",
+                "fontSize": 47
+              }
+            }
+          ],
+          "actual": [
+            {
+              "shortId": 42,
+              "renderOptions": {
+                "color": "#112233",
+                "fontSize": 31
+              }
+            },
+            {
+              "shortId": 42,
+              "renderOptions": {
+                "color": "#112233",
+                "fontSize": 31
+              }
+            },
+            {
+              "shortId": 43,
+              "renderOptions": {
+                "color": "#aabbcc",
+                "fontSize": 47
+              }
+            }
+          ]
+        },
+        {
+          "name": "getRender: GET /api/render/render-42-1 request count",
+          "passed": true,
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "getRender: GET /api/render/render-42-2 request count",
+          "passed": true,
+          "expected": 1,
+          "actual": 1
+        },
+        {
+          "name": "getRender: GET /api/render/render-43-1 request count",
+          "passed": true,
+          "expected": 2,
+          "actual": 2
+        }
+      ],
+      "artifacts": "/results",
+      "network": {
+        "mode": "loopback-only",
+        "enforced": true,
+        "interfaces": [
+          "lo"
+        ]
+      },
+      "preparation": {
+        "inputNode": "Fixture shorts",
+        "changes": [
+          {
+            "node": "Fixture shorts",
+            "change": "replace with fixture JSON items"
+          },
+          {
+            "node": "renderShort",
+            "change": "route URL to local mock; remove credential references; authentication=none"
+          },
+          {
+            "node": "getRender",
+            "change": "route URL to local mock; remove credential references; authentication=none"
+          }
+        ],
+        "omittedNodes": [
+          "Fixture start"
+        ]
+      },
+      "runDirectory": "/results/run-lDpPhk",
+      "n8nVersion": "2.41.7",
+      "requests": [
+        {
+          "node": "renderShort",
+          "method": "POST",
+          "path": "/api/render/",
+          "body": {
+            "shortId": 42,
+            "renderOptions": {
+              "color": "#112233",
+              "fontSize": 31
+            }
+          },
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-42-1"
+          }
+        },
+        {
+          "node": "getRender",
+          "method": "GET",
+          "path": "/api/render/render-42-1",
+          "body": null,
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-42-1",
+            "status": "FAILED"
+          }
+        },
+        {
+          "node": "renderShort",
+          "method": "POST",
+          "path": "/api/render/",
+          "body": {
+            "shortId": 42,
+            "renderOptions": {
+              "color": "#112233",
+              "fontSize": 31
+            }
+          },
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-42-2"
+          }
+        },
+        {
+          "node": "getRender",
+          "method": "GET",
+          "path": "/api/render/render-42-2",
+          "body": null,
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-42-2",
+            "status": "COMPLETED"
+          }
+        },
+        {
+          "node": "renderShort",
+          "method": "POST",
+          "path": "/api/render/",
+          "body": {
+            "shortId": 43,
+            "renderOptions": {
+              "color": "#aabbcc",
+              "fontSize": 47
+            }
+          },
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-43-1"
+          }
+        },
+        {
+          "node": "getRender",
+          "method": "GET",
+          "path": "/api/render/render-43-1",
+          "body": null,
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-43-1",
+            "status": "PENDING"
+          }
+        },
+        {
+          "node": "getRender",
+          "method": "GET",
+          "path": "/api/render/render-43-1",
+          "body": null,
+          "matched": true,
+          "status": 200,
+          "response": {
+            "renderId": "render-43-1",
+            "status": "COMPLETED"
+          }
+        }
+      ],
+      "durationMs": 13614,
+      "exitCode": 0
+    },
+    "broken": {
+      "schemaVersion": 1,
+      "runnerVersion": "0.1.2",
+      "name": "One failed render, one pending render: preserve both short identities",
+      "startedAt": "2026-10-06T10:07:51.351Z",
+      "nodeVersion": "v26.7.0",
+      "status": "failed",
+      "checks": [
+        {
+          "name": "n8n execution succeeds",
+          "passed": false,
+          "actual": {
+            "cliExitCode": 1,
+            "lastNode": "renderShort",
+            "message": "The value in the \"JSON Body\" field is not valid JSON",
+            "description": "Unexpected token 'o', ...\"ptions\": [object Obj\"... is not valid JSON",
+            "executionFound": true
+          }
+        },
+        {
+          "name": "Record completed short: output 0",
+          "passed": false,
+          "expected": [
+            {
+              "shortId": 42,
+              "renderId": "render-42-2",
+              "status": "COMPLETED"
+            },
+            {
+              "shortId": 43,
+              "renderId": "render-43-1",
+              "status": "COMPLETED"
+            }
+          ],
+          "actual": []
+        },
+        {
+          "name": "mock: all requests match routes",
+          "passed": true,
+          "actual": []
+        },
+        {
+          "name": "mock: request limits and server",
+          "passed": true,
+          "actual": []
+        },
+        {
+          "name": "renderShort: POST /api/render/ request count",
+          "passed": false,
+          "expected": 3,
+          "actual": 0
+        },
+        {
+          "name": "renderShort: POST /api/render/ request bodies",
+          "passed": false,
+          "expected": [
+            {
+              "shortId": 42,
+              "renderOptions": {
+                "color": "#112233",
+                "fontSize": 31
+              }
+            },
+            {
+              "shortId": 42,
+              "renderOptions": {
+                "color": "#112233",
+                "fontSize": 31
+              }
+            },
+            {
+              "shortId": 43,
+              "renderOptions": {
+                "color": "#aabbcc",
+                "fontSize": 47
+              }
+            }
+          ],
+          "actual": []
+        },
+        {
+          "name": "getRender: GET /api/render/render-42-1 request count",
+          "passed": false,
+          "expected": 1,
+          "actual": 0
+        },
+        {
+          "name": "getRender: GET /api/render/render-42-2 request count",
+          "passed": false,
+          "expected": 1,
+          "actual": 0
+        },
+        {
+          "name": "getRender: GET /api/render/render-43-1 request count",
+          "passed": false,
+          "expected": 2,
+          "actual": 0
+        }
+      ],
+      "artifacts": "/results",
+      "network": {
+        "mode": "loopback-only",
+        "enforced": true,
+        "interfaces": [
+          "lo"
+        ]
+      },
+      "preparation": {
+        "inputNode": "Fixture shorts",
+        "changes": [
+          {
+            "node": "Fixture shorts",
+            "change": "replace with fixture JSON items"
+          },
+          {
+            "node": "renderShort",
+            "change": "route URL to local mock; remove credential references; authentication=none"
+          },
+          {
+            "node": "getRender",
+            "change": "route URL to local mock; remove credential references; authentication=none"
+          }
+        ],
+        "omittedNodes": [
+          "Fixture start"
+        ]
+      },
+      "runDirectory": "/results/run-lNHLfA",
+      "n8nVersion": "2.41.7",
+      "requests": [],
+      "durationMs": 12453,
+      "exitCode": 1
+    }
+  }
+}
