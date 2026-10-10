@@ -147,7 +147,6 @@ await copyFile(join(here, '../public-cases/swiftia-LICENSE.txt'), join(out, 'swi
 await writeFile(join(out, 'transformations.json'), JSON.stringify({
   source: 'https://github.com/mismai-li/n8n-youtube-to-shorts-workflow/blob/7cd32c2a6ccbb2ca6edf4bded2534e916fd08985/video_to_shorts_Automation.json',
   sourceFixture: '../public-cases/swiftia-after.json',
-  sourceFixtureSha256: createHash('sha256').update(raw).digest('hex'),
   copyright: 'Copyright (c) 2025 MI', license: 'MIT; see swiftia-LICENSE.txt',
   mockBaseUrl: base, stylingMode, repairedBody, videos, shorts,
   fixtureScope: 'Isolated original HTTP expressions, item pairing, and render-loop control flow against synthetic local HTTP responses.',
