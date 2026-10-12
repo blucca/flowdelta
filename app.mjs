@@ -151,7 +151,7 @@ function build() {
     acceptance=result.checks.map(()=>({status:'not run',notes:'',reviewRequired:false}));
     explanations=result.changes.map(change=>demoLoaded ? demoExplanation(change) : '');
     sharedValues=result.changes.map(()=>false);
-    render();$('report').scrollIntoView({behavior:'smooth',block:'start'});
+    render();$('report').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'});
   } catch(error) { fail(error.message || 'This workflow could not be compared. Check your n8n export format.'); }
 }
 function demoExplanation(change) {

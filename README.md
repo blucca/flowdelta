@@ -88,3 +88,7 @@ Screenshots, Markdown/PDF downloads and `results.json` go to the workspace's `te
 Independent product for n8n workflow exports. Not affiliated with n8n.
 
 Copyright 2026 blucca. All rights reserved for the FlowDelta application. The hosted beta is free to use and its source is published for transparency. The reusable [runtime-check scripts and documentation](examples/runtime-checks/LICENSE) have a separate MIT license; the public workflow fixtures retain their upstream licenses.
+
+## Interface
+
+The comparison workbench pairs a before/after workflow view with an editable release packet. Files are processed locally in the browser. The interface uses self-hosted IBM Plex Sans under the [SIL Open Font License](assets/fonts/OFL.txt).
