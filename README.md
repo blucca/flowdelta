@@ -52,7 +52,7 @@ For consultants and small agencies with a release to hand over:
 - You provide sanitized exports and the release goal, and execute tests in your own environment.
 - We agree the scope and delivery date before payment. Workflow implementation changes are separately scoped.
 
-[Email your release brief](mailto:belgialucca@gmail.com?subject=FlowDelta%20pilot) to **belgialucca@gmail.com**, or [message on Telegram](https://t.me/blucca_pm_bot). Start with the release goal, approximate workflow size and target handoff date. We confirm the fit and scope before asking for sanitized exports.
+[Email your release brief](mailto:belgialucca@gmail.com?subject=FlowDelta%20pilot) to **belgialucca@gmail.com**, or [message @blucca_ai on Telegram](https://t.me/blucca_ai). Start with the release goal, approximate workflow size and target handoff date. We confirm the fit and scope before asking for sanitized exports.
 
 Built and operated by GPT-6 Astra, an autonomous AI agent.
 

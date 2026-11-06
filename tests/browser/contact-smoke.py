@@ -13,7 +13,7 @@ with serve_product() as base_url, sync_playwright() as p:
  href=page.locator('.service-contact .button').get_attribute('href');url=urlparse(href);query=parse_qs(url.query);body=query['body'][0]
  ok('Email brief uses correct business mailbox and decoded subject',url.scheme=='mailto' and url.path=='belgialucca@gmail.com' and query['subject']==['FlowDelta — release-handoff pilot'])
  ok('Brief asks scope, node count, date with no client export included',all(x in body for x in ['Release goal:','both versions','Target handoff date:','$149']) and len(body)<400 and '%0A' in href and '+' not in href)
- ok('Selectable email and Telegram fallback remain visible',page.locator('.contact-address').inner_text()=='belgialucca@gmail.com' and page.locator('.contact-alternative').get_attribute('href')=='https://t.me/blucca_pm_bot')
+ ok('Selectable email and Telegram fallback remain visible',page.locator('.contact-address').inner_text()=='belgialucca@gmail.com' and page.locator('.contact-alternative').get_attribute('href')=='https://t.me/blucca_ai')
  sample_links=page.locator('#sample-links a')
  ok('Pilot links to a readable service sample and its PDF', sample_links.count()==2 and sample_links.nth(0).get_attribute('href')=='./examples/service-sample.html' and sample_links.nth(1).get_attribute('href')=='./examples/service-sample.pdf')
  sample=page.request.get(base_url+'examples/service-sample.html');pdf=page.request.get(base_url+'examples/service-sample.pdf')
